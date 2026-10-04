@@ -5,11 +5,11 @@ target/
 !**/src/test/**/target/
 
 ### Credenciales locales ###
-# Aquí van la contraseña de la base de datos y la clave de firma. Spring Boot lo
-# carga por encima de application.properties, así que el proyecto funciona sin
-# variables de entorno sin que el secreto acabe en GitHub.
-src/main/resources/application-local.properties
-src/main/resources/application-*.local.properties
+# Aquí van la contraseña de la base de datos y la clave de firma. Vive en la raíz
+# del proyecto (y no en src/main/resources) para que Maven no lo meta dentro del
+# JAR que se despliega en Render. application.properties lo importa con
+# spring.config.import, y lo que está importado pisa a lo del propio archivo.
+/application-local.properties
 *.env
 
 ### STS ###
