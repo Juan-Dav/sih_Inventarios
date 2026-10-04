@@ -1,0 +1,48 @@
+# Lo que se le manda a Docker al construir. Todo lo listado aquí se queda fuera
+# del contexto, así que no llega a la imagen ni ocupa capas.
+
+# ============================================================
+# Credenciales: lo más importante de este archivo
+# ============================================================
+# .gitignore ya evita que application-local.properties se suba a GitHub, pero
+# Render construye la imagen desde el disco, no desde el repositorio: si alguien
+# prueba el build en local, el archivo seguiría estando en el contexto y la
+# contraseña de Aiven quedaría guardada en una capa de la imagen, que es
+# justo lo que este proyecto intenta que no ocurra.
+/application-local.properties
+application-*.local.properties
+*.env
+.env*
+
+# ============================================================
+# El frontend es otra aplicación
+# ============================================================
+# Render construye el Angular por su cuenta como Static Site, así que aquí no
+# hace falta. Además son unos 300 MB con node_modules, que Docker enviaría en
+# cada build sin sacarle ningún provecho.
+sih-inventarios-frontend/
+
+# ============================================================
+# Nada de esto interviene en compilar el backend
+# ============================================================
+# target/ es la salida de una construcción local: meterlo sería meter un
+# compilado viejo en la imagen.
+/target
+.git/
+.gitignore
+.gitattributes
+.vscode/
+.idea/
+HELP.md
+*.md
+
+# El Dockerfile usa el Maven que ya viene en la imagen de construcción, así que
+# el wrapper del proyecto no hace falta. Si algún día se compila con ./mvnw,
+# hay que quitar estas dos líneas.
+.mvn/
+mvnw
+mvnw.cmd
+
+# Ni la imagen final ni las capas intermedias lo necesitan.
+Dockerfile
+.dockerignore
