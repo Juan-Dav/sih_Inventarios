@@ -1,11 +1,15 @@
 /**
  * Base del backend.
  *
- * Sigue siendo una constante hardcodeada (el propio código ya lo lleva un TODO
- * desde antes): lo ideal es moverla a un environment para poder cambiar de
- * servidor sin recompilar.
+ * Apunta al servicio desplegado en Render. Todo lo demás (API_USUARIOS,
+ * API_SALAS, ...) se deriva de aquí, así que este es el único sitio donde hay
+ * que cambiar la dirección para mover el backend.
+ *
+ * Sigue siendo una constante, pero ahora el valor por defecto es el que sirve
+ * en producción. Para trabajar contra un backend local en el 8080, cambia esta
+ * línea a 'http://localhost:8080/api' y recarga.
  */
-export const API_BASE = 'http://localhost:8080/api';
+export const API_BASE = 'https://sih-inventarios.onrender.com/api';
 
 export const API_USUARIOS = `${API_BASE}/usuarios`;
 export const API_SALAS = `${API_BASE}/salas`;

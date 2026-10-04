@@ -336,7 +336,7 @@ export class InventarioService {
         if (typeof mensaje === 'string') return mensaje;
       }
 
-      if (error.status === 0) return 'No hay conexión con el backend. ¿Está corriendo en el 8080?';
+      if (error.status === 0) return 'No hay conexión con el backend. Revisa tu internet o que el servicio esté en marcha.';
       if (error.status === 401) return 'Tu sesión expiró. Vuelve a iniciar sesión.';
       if (error.status === 403) return 'Tu rol no tiene permiso para esta acción.';
       return `El backend respondió con el estado ${error.status}.`;
