@@ -1,0 +1,111 @@
+<div
+  class="velo fixed inset-0 z-[70] flex items-center justify-center overflow-y-auto bg-ink-950/85 p-4 backdrop-blur-sm"
+  (click)="cerrado.emit()"
+>
+  <div
+    role="alertdialog"
+    aria-modal="true"
+    [attr.aria-label]="titulo()"
+    class="caja relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-ink-900/95 p-7 text-center shadow-2xl shadow-brand-600/25"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Franja superior con el degradado de marca -->
+    <span
+      class="absolute inset-x-0 top-0 h-1"
+      [class.bg-brand-gradient]="tipo() !== 'error'"
+      [class.bg-gradient-to-r]="tipo() === 'error'"
+      [class.from-pop-600]="tipo() === 'error'"
+      [class.via-pop-500]="tipo() === 'error'"
+      [class.to-brand-500]="tipo() === 'error'"
+    ></span>
+
+    <!-- ============ Icono animado ============ -->
+    <div class="mx-auto grid h-20 w-20 place-items-center">
+      @switch (tipo()) {
+        @case ('exito') {
+          <svg viewBox="0 0 72 72" fill="none" class="h-20 w-20" aria-hidden="true">
+            <circle
+              class="circulo-exito"
+              cx="36"
+              cy="36"
+              r="32"
+              fill="url(#gradExito)"
+            />
+            <path
+              class="trazo-exito"
+              d="M22 37.5 31.5 47 50 27"
+              stroke="#052e16"
+              stroke-width="6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <defs>
+              <linearGradient id="gradExito" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#34d399" />
+                <stop offset="100%" stop-color="#10b981" />
+              </linearGradient>
+            </defs>
+          </svg>
+        }
+        @case ('error') {
+          <svg viewBox="0 0 72 72" fill="none" class="equis h-20 w-20" aria-hidden="true">
+            <circle
+              cx="36"
+              cy="36"
+              r="32"
+              fill="url(#gradError)"
+            />
+            <path
+              class="trazo-error"
+              d="M25 25 47 47"
+              stroke="#4c0519"
+              stroke-width="6"
+              stroke-linecap="round"
+            />
+            <path
+              class="trazo-error"
+              d="M47 25 25 47"
+              stroke="#4c0519"
+              stroke-width="6"
+              stroke-linecap="round"
+            />
+            <defs>
+              <linearGradient id="gradError" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fb7185" />
+                <stop offset="100%" stop-color="#e11d48" />
+              </linearGradient>
+            </defs>
+          </svg>
+        }
+        @default {
+          <!-- Saludo: avatar con las iniciales -->
+          <div class="avatar">
+            <ng-content select="[dialogoAvatar]" />
+          </div>
+        }
+      }
+    </div>
+
+    <!-- ============ Texto ============ -->
+    <h2 class="mt-4 font-display text-2xl font-extrabold tracking-tight text-white">
+      {{ titulo() }}
+    </h2>
+
+    @if (mensaje()) {
+      <p class="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-ink-300">
+        {{ mensaje() }}
+      </p>
+    }
+
+    <!-- Contenido extra (rol, listas de campos faltantes, etc.) -->
+    <ng-content />
+
+    <button
+      type="button"
+      (click)="cerrado.emit()"
+      class="btn-glow mt-6 w-full px-5 py-3 text-sm tracking-wide"
+    >
+      {{ textoAccion() }}
+    </button>
+  </div>
+</div>

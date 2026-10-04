@@ -1,0 +1,490 @@
+@import 'tailwindcss';
+
+/* ============================================================
+    SIH INVENTARIOS — Sistema de diseño
+    Tailwind CSS v4 (configuración por tokens en @theme)
+   ============================================================ */
+
+@theme {
+  /* --- Tipografías --- */
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Sora', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* --- Marca: violeta eléctrico --- */
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-800: #5b21b6;
+  --color-brand-900: #4c1d95;
+  --color-brand-950: #2e1065;
+
+  /* --- Acento: fucsia vibrante --- */
+  --color-pop-100: #fae8ff;
+  --color-pop-200: #f5d0fe;
+  --color-pop-300: #f0abfc;
+  --color-pop-400: #e879f9;
+  --color-pop-500: #d946ef;
+  --color-pop-600: #c026d3;
+
+  /* --- Acento: verde energía --- */
+  --color-lime-pop: #a3e635;
+  --color-mint-400: #34d399;
+  --color-mint-500: #10b981;
+  /* Para texto sobre fondo claro: mint-500 da 2.5:1 sobre blanco y no se lee. */
+  --color-mint-700: #047857;
+
+  /* --- Acento: ámbar cálido --- */
+  --color-sun-400: #fbbf24;
+  --color-sun-500: #f59e0b;
+  --color-sun-700: #b45309;
+
+  /* --- Acento: cian vivo --- */
+  --color-aqua-300: #67e8f9;
+  --color-aqua-400: #22d3ee;
+  --color-aqua-500: #06b6d4;
+  /* Para texto sobre fondo claro: aqua-500 da 2.3:1 sobre blanco y no se lee. */
+  --color-aqua-700: #0e7490;
+
+  /* --- Superficies ---
+     ink-300/400/500/600 son los tonos claros: se usan sobre fondos oscuros
+     (hero, objetivos, footer).
+
+     ink-400 e ink-500 cumplen una condición doble, porque el mismo token se
+     usa sobre fondo claro (paneles, formularios, tablas) y sobre fondo oscuro
+     (portada, modales). Con los valores anteriores, ink-400 quedaba en 2.2:1
+     sobre blanco y las cabeceras de tabla resultaban ilegibles. Estos valores
+     dan al menos 4.5:1 sobre blanco sin bajar de 4:1 sobre ink-950.
+     ink-300 solo aparece sobre fondo oscuro y por eso no se oscurece. */
+  --color-ink-50: #f8fafc;
+  --color-ink-100: #f1f5f9;
+  --color-ink-200: #e2e8f0;
+  --color-ink-300: #cbd5e1;
+  --color-ink-400: #6b7a90;
+  --color-ink-500: #55637a;
+  --color-ink-600: #4a566a;
+  --color-ink-700: #334155;
+  --color-ink-800: #1e293b;
+  --color-ink-900: #0f172a;
+  --color-ink-950: #080a18;
+
+  /* --- Animaciones --- */
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-float-slow: float 11s ease-in-out infinite;
+  --animate-drift: drift 18s ease-in-out infinite alternate;
+  --animate-pulse-ring: pulse-ring 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-marquee: marquee 26s linear infinite;
+  --animate-shine: shine 5s linear infinite;
+  --animate-rise: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-blink: blink 2.4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(1.5deg);
+  }
+}
+
+@keyframes drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(45px, -35px) scale(1.18);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(139 92 246 / 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgb(139 92 246 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(139 92 246 / 0);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes shine {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ============================================================
+    Base
+   ============================================================ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-ink-50 font-sans text-ink-800 antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    @apply font-display;
+  }
+
+  ::selection {
+    @apply bg-pop-500/30 text-brand-950;
+  }
+
+  /* Scrollbar con la identidad visual del proyecto */
+  ::-webkit-scrollbar {
+    width: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-ink-100;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-gradient-to-b from-brand-500 to-pop-500;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply from-brand-600 to-pop-600;
+  }
+}
+
+/* ============================================================
+    Componentes / utilidades reutilizables
+   ============================================================ */
+@layer components {
+  /* Tarjeta de cristal clara */
+  .glass-light {
+    @apply border border-white/70 bg-white/70 backdrop-blur-md;
+  }
+
+  /* Tarjeta de cristal oscura */
+  .glass-dark {
+    @apply border border-white/10 bg-white/5 backdrop-blur-md;
+  }
+
+  /* Texto con degradado animado */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      100deg,
+      var(--color-brand-400),
+      var(--color-pop-500) 35%,
+      var(--color-aqua-400) 70%,
+      var(--color-brand-400)
+    );
+    background-size: 200% auto;
+    animation: var(--animate-shine);
+  }
+
+  /* Degradado de marca reutilizable */
+  .bg-brand-gradient {
+    background-image: linear-gradient(
+      120deg,
+      var(--color-brand-600),
+      var(--color-pop-600) 50%,
+      var(--color-aqua-500)
+    );
+  }
+
+  /* Botón primario con brillo al pasar el cursor */
+  .btn-glow {
+    @apply relative overflow-hidden rounded-xl font-bold text-white;
+    transition:
+      transform 0.3s,
+      box-shadow 0.3s;
+    background-image: linear-gradient(120deg, var(--color-brand-600), var(--color-pop-600));
+    box-shadow: 0 10px 30px -10px rgb(124 58 237 / 0.7);
+  }
+  .btn-glow:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 18px 40px -12px rgb(192 38 211 / 0.85),
+      0 0 0 1px rgb(255 255 255 / 0.12) inset;
+  }
+  .btn-glow::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+    transition: transform 0.7s ease;
+  }
+  .btn-glow:hover::after {
+    @apply translate-x-full;
+  }
+
+  /* Contenedor de sección */
+  .shell {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Rejilla decorativa de fondo (secciones oscuras).
+     Vive aquí y no en el CSS del componente: con encapsulamiento de Angular
+     no se aplicaba en el hero, objetivos ni footer. */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+}
+
+/* ============================================================
+    Revelado al hacer scroll (usado por la directiva appReveal)
+
+    `opacity` y `transform` van por separado y el primero dura mucho
+    menos que el segundo. Con una sola transición de 0.7s para los
+    dos, al desplazarse deprisa los bloques quedaban a media opacidad
+    y el texto se veía aclarado hasta que el efecto terminaba. Ahora
+    el texto alcanza su nitidez enseguida y el movimiento, que es lo
+    que se percibe como "aparición", sigue su curso.
+   ============================================================ */
+@layer utilities {
+  [appReveal] {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+    transition:
+      opacity 0.22s ease-out,
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  [appReveal].reveal-in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /*
+   * Si el hilo principal se ocupa, la transición se acorta a un solo
+   * fotograma en lugar de dejar el texto a media opacidad.
+   */
+  @media (prefers-reduced-transparency: reduce) {
+    [appReveal] {
+      transition: none;
+    }
+  }
+
+  /* Respeta la preferencia de movimiento reducido */
+  @media (prefers-reduced-motion: reduce) {
+    [appReveal] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .animate-float,
+    .animate-float-slow,
+    .animate-drift,
+    .animate-marquee,
+    .animate-shine,
+    .animate-pulse-ring {
+      animation: none !important;
+    }
+  }
+}
+
+/* ============================================================
+    TEMA OSCURO POR ROL
+
+    Los tres paneles dejan de parecer una hoja de cálculo encendida y
+    pasan a un panel de control. Cada rol tiene su propia base oscura y su
+    propia mezcla de colores, para que de un vistazo se sepa quién está
+    mirando la pantalla.
+
+    Lo que evita reescribir módulo por módulo es la inversión de la escala
+    "ink". Esa escala está pensada para fondos claros: ink-900 es el texto
+    principal y ink-50 es el fondo. Aquí se invierte, y como Tailwind lee
+    los tokens por variable CSS, todo lo que ya usa clases como
+    `text-ink-900`, `bg-ink-100` o `border-ink-200` se adapta con solo poner
+    `.tema-panel` en un ancestro.
+   ============================================================ */
+
+@layer components {
+  .tema-panel {
+    /*
+     * Le dice al navegador que aquí los controles nativos son oscuros: la lista
+     * de un `<select>`, las barras de desplazamiento y los selectores de fecha
+     * se dibujan con el fondo del sistema, que si no es blanco deja el texto
+     * claro del panel sobre blanco.
+     */
+    color-scheme: dark;
+
+    /*
+     * Texto base del panel.
+     *
+     * Hace falta porque `body` fija `text-ink-800`, y ese `color` ya está
+     * calculado antes de llegar aquí: las variables se resuelven en el elemento
+     * que las usa, y en `body` `--color-ink-800` todavía vale `#1e293b` (el
+     * valor del tema claro de `:root`). Invertir la escala en `.tema-panel` no
+     * alcanza, porque un descendiente no puede cambiar el `color` heredado: solo
+     * declararlo aquí.
+     *
+     * Sin esta línea, todo el texto que no lleva su propia clase de color — las
+     * celdas de las tablas, los `td` sueltos — salía casi negro sobre el fondo
+     * oscuro y los números de los conteos no se leían.
+     */
+    color: var(--color-ink-800);
+
+    /* Fondo y halos de luz que le dan profundidad al panel. */
+    --panel-base: #121729;
+    --panel-halo-1: rgb(124 58 237 / 0.3);
+    --panel-halo-2: rgb(6 182 212 / 0.16);
+    --panel-halo-3: rgb(2 6 23 / 0.9);
+    --panel-rejilla: rgb(255 255 255 / 0.05);
+    --panel-puntos: rgb(255 255 255 / 0.16);
+    --panel-acento: #c4b5fd;
+    --panel-anillo: rgb(124 58 237 / 0.5);
+
+    /* Escala ink dada la vuelta: los números bajos son los oscuros. */
+    --color-ink-50: #0a0e1c;
+    --color-ink-100: #131a30;
+    --color-ink-200: #1f2843;
+    --color-ink-300: #2c3758;
+    --color-ink-400: #94a3bd;
+    --color-ink-500: #b3bed4;
+    --color-ink-600: #cbd4e6;
+    --color-ink-700: #dde3f0;
+    --color-ink-800: #eff3fb;
+    --color-ink-900: #ffffff;
+    --color-ink-950: #04060e;
+  }
+
+  /* Administrador: violeta profundo, el color de la marca. */
+  .tema-admin {
+    --panel-base: #16102f;
+    --panel-halo-1: rgb(139 92 246 / 0.34);
+    --panel-halo-2: rgb(217 70 239 / 0.16);
+    --panel-halo-3: rgb(9 5 26 / 0.92);
+    --panel-acento: #d8b4fe;
+    --panel-anillo: rgb(139 92 246 / 0.55);
+  }
+
+  /* Técnico: verde petróleo, asociado al mantenimiento. */
+  .tema-tecnico {
+    --panel-base: #08201f;
+    --panel-halo-1: rgb(16 185 129 / 0.3);
+    --panel-halo-2: rgb(6 182 212 / 0.2);
+    --panel-halo-3: rgb(2 16 17 / 0.92);
+    --panel-acento: #6ee7b7;
+    --panel-anillo: rgb(16 185 129 / 0.55);
+  }
+
+  /* Docente: azul medianoche, el color de consulta y seguimiento. */
+  .tema-docente {
+    --panel-base: #0c1a35;
+    --panel-halo-1: rgb(34 211 238 / 0.24);
+    --panel-halo-2: rgb(99 102 241 / 0.18);
+    --panel-halo-3: rgb(3 8 24 / 0.92);
+    --panel-acento: #7dd3fc;
+    --panel-anillo: rgb(34 211 238 / 0.55);
+  }
+}
+
+/*
+ * Estas clases se declaran con `@utility` y no como CSS suelto para que las
+ * variantes de Tailwind (`hover:`, `focus:`, `md:`) sigan funcionando sobre
+ * ellas, igual que con cualquier clase del framework.
+ */
+
+@utility fondo-panel {
+  background-color: var(--panel-base);
+  background-image:
+    radial-gradient(60rem 42rem at 10% -12%, var(--panel-halo-1), transparent 62%),
+    radial-gradient(52rem 38rem at 92% -6%, var(--panel-halo-2), transparent 64%),
+    linear-gradient(180deg, var(--panel-halo-3), transparent 55%);
+  background-attachment: fixed;
+}
+
+/* Caja de vidrio clara: tarjetas, cabeceras y paneles del shell. */
+@utility superficie {
+  background-color: rgb(255 255 255 / 0.05);
+  border: 1px solid rgb(255 255 255 / 0.11);
+  backdrop-filter: blur(14px);
+}
+
+/* Variante sin desenfoque, para listas largas donde el blur encarece. */
+@utility superficie-solida {
+  background-color: rgb(10 14 30 / 0.78);
+  border: 1px solid rgb(255 255 255 / 0.1);
+}
+
+@utility rejilla-panel {
+  background-image:
+    linear-gradient(to right, var(--panel-rejilla) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--panel-rejilla) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+}
+
+@utility puntos-panel {
+  background-image: radial-gradient(var(--panel-puntos) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+
+/*
+ * Colores de texto de acento que sí se leen sobre fondo oscuro. Los tokens
+ * mint-500, sun-500, aqua-500 y pop-600 están calibrados para texto sobre
+ * blanco: sobre este fondo darían menos de 3:1 y habría que adivinarlos.
+ */
+@utility txt-ok {
+  color: #6ee7b7;
+}
+
+@utility txt-espera {
+  color: #fcd34d;
+}
+
+@utility txt-alerta {
+  color: #f9a8d4;
+}
+
+@utility txt-info {
+  color: #7dd3fc;
+}
+
+@utility txt-acento {
+  color: var(--panel-acento);
+}

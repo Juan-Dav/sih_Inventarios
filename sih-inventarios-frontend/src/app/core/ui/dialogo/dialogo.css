@@ -1,0 +1,129 @@
+:host {
+  display: contents;
+}
+
+/* ============================================================
+   Fondo y contenedor
+   ============================================================ */
+.velo {
+  animation: velo-entra 0.25s ease-out both;
+}
+
+.caja {
+  animation: caja-entra 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============================================================
+   Chulo: el círculo entra con rebote y el trazo se dibuja
+   ============================================================ */
+.circulo-exito {
+  animation: circulo-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.trazo-exito {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: trazo-dibuja 0.35s 0.3s ease-out forwards;
+}
+
+/* ============================================================
+   Equis: los dos trazos se dibujan y el icono tiembla
+   ============================================================ */
+.equis {
+  animation: equis-entra 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.trazo-error {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: trazo-dibuja 0.3s 0.2s ease-out forwards;
+}
+
+/* ============================================================
+   Avatar de la bienvenida
+   ============================================================ */
+.avatar {
+  animation: circulo-pop 0.55s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ============================================================
+   Fotogramas
+   ============================================================ */
+@keyframes velo-entra {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes caja-entra {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes circulo-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Reduce el temblor de la equis y el rebote del chulo */
+@keyframes equis-entra {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  55% {
+    transform: scale(0.95) translateX(3px);
+  }
+  70% {
+    transform: scale(1.02) translateX(-3px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+@keyframes trazo-dibuja {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Respeta la preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .velo,
+  .caja,
+  .circulo-exito,
+  .equis,
+  .avatar {
+    animation: none;
+  }
+  .trazo-exito,
+  .trazo-error {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+}

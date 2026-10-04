@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+/* Anillo degradado del avatar */
+.avatar-ring {
+  position: relative;
+  padding: 2px;
+  border-radius: 9999px;
+  background-image: linear-gradient(135deg, #8b5cf6, #d946ef, #22d3ee);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* El relleno lo aporta el degradado que se aplica al span interior, así que
+   aquí solo se centra el icono. Antes se fijaba `background: #ffffff`, que
+   ganaba por cascada y dejaba el avatar completamente blanco. */
+.avatar-ring > span {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+}
+
+.group:hover .avatar-ring {
+  transform: rotate(6deg) scale(1.06);
+}

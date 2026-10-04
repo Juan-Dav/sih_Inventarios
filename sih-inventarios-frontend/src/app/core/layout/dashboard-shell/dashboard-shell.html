@@ -1,0 +1,154 @@
+<div class="tema-panel fondo-panel min-h-screen" [class]="tema()">
+  <!-- Fondo decorativo: los halos y la rejilla los define cada tema de rol -->
+  <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+    <div class="absolute inset-0 rejilla-panel opacity-70"></div>
+    <div class="absolute inset-0 puntos-panel opacity-30"></div>
+  </div>
+
+  <!-- ================= Barra superior fija =================
+       Va fuera de la columna del contenido y con `sticky`, porque al hacer
+       scroll en un módulo largo el nombre, el rol y el botón de salir tienen
+       que seguir a la vista. Antes quedaban en la parte alta de la columna y
+       se perdían en cuanto se desplazaba la tabla. -->
+  <header class="sticky top-0 z-30 border-b border-white/10">
+    <div class="mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 lg:px-8">
+      <a routerLink="/" class="flex shrink-0 items-center gap-2.5" aria-label="Ir a la portada">
+        <span class="grid h-9 w-9 place-items-center rounded-xl font-display text-sm font-black text-white" [class]="gradiente()">
+          SI
+        </span>
+        <span class="hidden font-display text-sm font-extrabold text-ink-900 sm:block">
+          {{ titulo() }}
+        </span>
+      </a>
+
+      <span
+        class="hidden shrink-0 rounded-full px-3 py-1 text-[0.6rem] font-bold tracking-[0.14em] ring-1 ring-inset md:inline-block"
+        [class]="halo()"
+      >
+        {{ etiquetaRol[rol()] }}
+      </span>
+
+      <div class="ml-auto flex min-w-0 items-center gap-3">
+        <div class="flex min-w-0 items-center gap-2.5">
+          <span
+            class="grid h-9 w-9 shrink-0 place-items-center rounded-xl font-display text-xs font-black text-white"
+            [class]="gradiente()"
+            aria-hidden="true"
+          >
+            {{ iniciales() }}
+          </span>
+          <div class="min-w-0 leading-tight">
+            <p class="truncate text-sm font-bold text-ink-900">{{ auth.usuario()?.nombre }}</p>
+            <p class="truncate text-[0.68rem] text-ink-500">{{ auth.usuario()?.correo }}</p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="cerrarSesion()"
+          class="flex shrink-0 items-center gap-2 rounded-xl bg-ink-950 px-3 py-2 text-[0.68rem] font-bold tracking-wide text-white transition-colors hover:bg-ink-800 sm:px-4 sm:text-xs"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="iconos['salir']" />
+          </svg>
+          <span class="hidden sm:inline">CERRAR SESIÓN</span>
+          <span class="sr-only sm:hidden">Cerrar sesión</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto flex w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:gap-8 lg:px-8">
+    <!-- ================= Menú lateral =================
+         `lg:sticky` lo ancla al scroll, pero sin alto máximo ni scroll propio:
+         con módulos largos el menú crecía con el contenido y todo el panel se
+         desplazaba junto, como en la portada. Antes tenía
+         `max-h-[calc(100vh-7rem)]` y `overflow-y-auto`, y entonces el menú se
+         movía aparte del contenido: dos barras para el mismo panel, y la rueda
+         sobre el menú lo recorría sin que la tabla de al lado avanzara. -->
+    <aside class="shrink-0 lg:sticky lg:top-24 lg:self-start lg:w-72">
+      <div class="superficie relative rounded-3xl p-5">
+        <!-- Franja de acento del rol en el canto superior -->
+        <span class="absolute inset-x-0 top-0 h-1.5" [class]="gradiente()"></span>
+
+        <div class="relative">
+          <p class="text-[0.6rem] font-bold tracking-[0.22em] uppercase" [class]="acento()">
+            {{ etiquetaRol[rol()] }}
+          </p>
+          <h1 class="mt-1 font-display text-2xl font-extrabold leading-tight text-ink-900">
+            {{ titulo() }}
+          </h1>
+          <p class="mt-2 text-xs leading-relaxed text-ink-600">{{ subtitulo() }}</p>
+
+          <nav class="menu-panel mt-6 flex flex-row gap-1.5 overflow-x-auto pb-1 lg:flex-col lg:gap-1.5 lg:overflow-visible lg:pb-0" aria-label="Módulos del panel">
+            @for (item of menu(); track item.ruta) {
+              <a
+                [routerLink]="item.ruta"
+                routerLinkActive="item-activo"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="item-item menu-item group relative flex items-start gap-3 overflow-hidden rounded-2xl py-3 pl-4 pr-3 transition-all duration-300 hover:bg-ink-100"
+              >
+                <!-- Barra de acento con el color del rol -->
+                <span class="barra-acento absolute inset-y-2 left-0 w-1 rounded-full" [class]="gradiente()"></span>
+
+                <span
+                  class="caja-icono mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-ink-100 text-ink-600 transition-colors duration-300 group-hover:text-ink-900"
+                >
+                  <svg class="h-[1.15rem] w-[1.15rem]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="iconos[item.icon]" />
+                  </svg>
+                </span>
+
+                <span class="min-w-0 flex-1">
+                  <span class="flex items-center gap-2">
+                    <span class="texto-item text-sm font-bold text-ink-800">{{ item.label }}</span>
+                    @if (item.insignia) {
+                      <span class="insignia rounded-full bg-ink-100 px-2 py-0.5 text-[0.6rem] font-bold tracking-wide text-ink-600">
+                        {{ item.insignia }}
+                      </span>
+                    }
+                  </span>
+                  <span class="texto-desc mt-0.5 block text-xs leading-snug text-ink-600">
+                    {{ item.descripcion }}
+                  </span>
+                </span>
+              </a>
+            }
+          </nav>
+
+          @if (proximos().length > 0) {
+            <div class="mt-5 border-t border-ink-200/70 pt-4">
+              <p class="px-3 text-[0.6rem] font-bold tracking-[0.2em] text-ink-500 uppercase">Próximamente</p>
+              <ul class="mt-2 flex flex-col gap-1">
+                @for (proximo of proximos(); track proximo) {
+                  <li class="flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold text-ink-500">
+                    <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-ink-300"></span>
+                    {{ proximo }}
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          <div class="mt-6 border-t border-ink-200/70 pt-4">
+            <a
+              routerLink="/"
+              class="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-ink-600 transition-colors hover:bg-ink-100 hover:text-ink-900"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="iconos['volver']" />
+              </svg>
+              Volver a la portada
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ================= Contenido ================= -->
+    <div class="min-w-0 flex-1">
+      <!-- Aquí se dibuja el módulo de la ruta activa -->
+      <router-outlet />
+    </div>
+  </div>
+</div>

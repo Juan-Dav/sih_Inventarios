@@ -1,0 +1,958 @@
+<section
+  id="inicio"
+  class="relative overflow-hidden bg-ink-950 pt-28 pb-16 sm:pt-32 lg:pt-36 lg:pb-20"
+>
+  <!-- Fondo decorativo -->
+  <div class="bg-grid pointer-events-none absolute inset-0" aria-hidden="true"></div>
+  <div class="orb orb-brand animate-drift -top-24 -left-20 h-72 w-72" aria-hidden="true"></div>
+  <div
+    class="orb orb-pop animate-drift top-10 -right-16 h-80 w-80"
+    style="animation-delay: -6s"
+    aria-hidden="true"
+  ></div>
+  <div class="orb orb-aqua animate-float-slow bottom-0 left-1/3 h-64 w-64" aria-hidden="true"></div>
+
+  <div class="shell relative">
+    <!-- Copy -->
+    <div class="mx-auto max-w-3xl text-center">
+      <span
+        appReveal
+        class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[0.7rem] font-bold tracking-[0.18em] text-brand-200 uppercase backdrop-blur-md"
+      >
+        <span class="relative flex h-2 w-2">
+          <span
+            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-mint-400 opacity-75"
+          ></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-mint-400"></span>
+        </span>
+        Plataforma de gestión tecnológica
+      </span>
+
+      <h1
+        appReveal
+        [appRevealDelay]="80"
+        class="mt-6 font-display text-4xl leading-[1.08] font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl"
+      >
+        Control total de tus
+        <span class="text-gradient">recursos tecnológicos</span>
+      </h1>
+
+      <p
+        appReveal
+        [appRevealDelay]="160"
+        class="mx-auto mt-5 max-w-2xl text-base leading-relaxed font-light text-ink-200 sm:text-lg"
+      >
+        El software especializado para instituciones educativas. Optimiza la administración,
+        documenta fallas y supervisa el estado de tus equipos en tiempo real.
+      </p>
+
+      <!-- Etiquetas -->
+      <ul
+        appReveal
+        [appRevealDelay]="220"
+        class="mt-6 flex flex-wrap items-center justify-center gap-2"
+      >
+        @for (tag of tags; track tag) {
+          <li
+            class="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-[0.7rem] font-semibold tracking-wide text-ink-200 transition-colors duration-300 hover:border-pop-400/60 hover:bg-pop-500/10 hover:text-white"
+          >
+            {{ tag }}
+          </li>
+        }
+      </ul>
+
+      <!-- Botones -->
+      <div
+        appReveal
+        [appRevealDelay]="280"
+        class="mt-8 flex flex-wrap items-center justify-center gap-3"
+      >
+        <a href="#objetivos" class="btn-glow animate-pulse-ring px-6 py-3 text-sm">
+          Explorar el sistema
+        </a>
+        <a
+          href="#mision-vision"
+          class="rounded-xl border border-white/20 px-6 py-3 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-aqua-400 hover:bg-white/10"
+        >
+          Conoce el proyecto
+        </a>
+      </div>
+    </div>
+
+    <!-- Mockup del sistema + estadísticas -->
+    <div class="relative mt-12 lg:mt-14">
+      <!-- Tarjeta flotante izquierda -->
+      <div
+        appReveal
+        [appRevealDelay]="340"
+        class="chip animate-float-slow -top-5 left-0 hidden sm:flex lg:-left-6"
+      >
+        <span class="grid h-7 w-7 place-items-center rounded-lg bg-mint-400/20">
+          <svg
+            class="h-4 w-4 text-mint-400"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </span>
+        Estado verificado
+      </div>
+
+      <!-- Tarjeta flotante derecha -->
+      <div
+        appReveal
+        [appRevealDelay]="420"
+        class="chip animate-float top-10 right-0 hidden sm:flex lg:-right-6"
+      >
+        <span class="grid h-7 w-7 place-items-center rounded-lg bg-pop-500/20">
+          <svg
+            class="h-4 w-4 text-pop-400"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </span>
+        Actualización en vivo
+      </div>
+
+      <!-- Mockup del sistema: SVG en línea con textos reales, sin imágenes externas -->
+      <div appReveal [appRevealDelay]="380" class="frame group">
+        <div class="frame-inner h-64 sm:h-80 lg:h-[420px]">
+          <svg
+            class="mockup"
+            viewBox="0 0 1200 460"
+            preserveAspectRatio="xMidYMid meet"
+            font-family="'Plus Jakarta Sans', system-ui, sans-serif"
+            role="img"
+            aria-label="Panel de SIH Inventarios: 248 equipos registrados, 221 operativos, 19 en mantenimiento y 8 de baja, con el detalle por aula y estado."
+          >
+            <defs>
+              <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#7c3aed" />
+                <stop offset="0.5" stop-color="#c026d3" />
+                <stop offset="1" stop-color="#06b6d4" />
+              </linearGradient>
+              <clipPath id="panelClip">
+                <rect width="1200" height="460" rx="18" />
+              </clipPath>
+            </defs>
+
+            <g clip-path="url(#panelClip)">
+              <!-- Superficies del panel, barra superior y menú lateral -->
+              <rect width="1200" height="460" fill="#0f172a" />
+              <rect width="1200" height="54" fill="#141c30" />
+              <rect y="53" width="1200" height="1" fill="#ffffff" fill-opacity="0.07" />
+              <rect y="54" width="228" height="406" fill="#0a0f1e" />
+              <rect x="227" y="54" width="1" height="406" fill="#ffffff" fill-opacity="0.07" />
+
+              <g class="mockup-panel">
+                <!-- Barra superior -->
+                <circle cx="30" cy="27" r="6" fill="#ef4444" fill-opacity="0.55" />
+                <circle cx="50" cy="27" r="6" fill="#f59e0b" fill-opacity="0.55" />
+                <circle cx="70" cy="27" r="6" fill="#10b981" fill-opacity="0.55" />
+                <text
+                  x="96"
+                  y="32"
+                  fill="#ffffff"
+                  fill-opacity="0.9"
+                  font-size="13"
+                  font-weight="700"
+                >
+                  SIH Inventarios
+                </text>
+                <rect
+                  x="1044"
+                  y="17"
+                  width="120"
+                  height="20"
+                  rx="10"
+                  fill="#ffffff"
+                  fill-opacity="0.06"
+                />
+                <circle cx="1060" cy="27" r="4" fill="#34d399" />
+                <text x="1070" y="31" fill="#6ee7b7" font-size="10.5" font-weight="600">
+                  Sincronizado
+                </text>
+
+                <!-- Identidad de la aplicación -->
+                <rect x="20" y="76" width="44" height="44" rx="14" fill="url(#brandGrad)" />
+                <text
+                  x="42"
+                  y="106"
+                  fill="#ffffff"
+                  font-size="21"
+                  font-weight="800"
+                  text-anchor="middle"
+                >
+                  S
+                </text>
+                <text
+                  x="76"
+                  y="98"
+                  fill="#ffffff"
+                  fill-opacity="0.88"
+                  font-size="12"
+                  font-weight="700"
+                >
+                  SIH Inventarios
+                </text>
+                <text
+                  x="76"
+                  y="112"
+                  fill="#ffffff"
+                  fill-opacity="0.42"
+                  font-size="9"
+                  font-weight="500"
+                >
+                  Gestión Institucional
+                </text>
+
+                <!-- Menú lateral: entrada activa -->
+                <rect
+                  x="16"
+                  y="138"
+                  width="196"
+                  height="48"
+                  rx="12"
+                  fill="#8b5cf6"
+                  fill-opacity="0.16"
+                />
+                <rect x="28" y="146" width="32" height="32" rx="9" fill="url(#brandGrad)" />
+                <rect
+                  x="36"
+                  y="156"
+                  width="16"
+                  height="4"
+                  rx="2"
+                  fill="#ffffff"
+                  fill-opacity="0.9"
+                />
+                <rect
+                  x="36"
+                  y="164"
+                  width="10"
+                  height="4"
+                  rx="2"
+                  fill="#ffffff"
+                  fill-opacity="0.55"
+                />
+                <text x="74" y="162" fill="#ffffff" font-size="11.5" font-weight="600">
+                  Inventario
+                </text>
+                <text
+                  x="74"
+                  y="175"
+                  fill="#ffffff"
+                  fill-opacity="0.5"
+                  font-size="9"
+                  font-weight="500"
+                >
+                  248 equipos
+                </text>
+
+                <!-- Menú lateral: resto de entradas -->
+                <rect
+                  x="28"
+                  y="196"
+                  width="32"
+                  height="32"
+                  rx="9"
+                  fill="#ffffff"
+                  fill-opacity="0.06"
+                />
+                <text
+                  x="74"
+                  y="217"
+                  fill="#ffffff"
+                  fill-opacity="0.72"
+                  font-size="11.5"
+                  font-weight="600"
+                >
+                  Mantenimientos
+                </text>
+
+                <rect
+                  x="28"
+                  y="236"
+                  width="32"
+                  height="32"
+                  rx="9"
+                  fill="#ffffff"
+                  fill-opacity="0.06"
+                />
+                <text
+                  x="74"
+                  y="257"
+                  fill="#ffffff"
+                  fill-opacity="0.72"
+                  font-size="11.5"
+                  font-weight="600"
+                >
+                  Reportes
+                </text>
+
+                <rect
+                  x="28"
+                  y="276"
+                  width="32"
+                  height="32"
+                  rx="9"
+                  fill="#ffffff"
+                  fill-opacity="0.06"
+                />
+                <text
+                  x="74"
+                  y="297"
+                  fill="#ffffff"
+                  fill-opacity="0.72"
+                  font-size="11.5"
+                  font-weight="600"
+                >
+                  Equipos de cómputo
+                </text>
+
+                <rect
+                  x="28"
+                  y="316"
+                  width="32"
+                  height="32"
+                  rx="9"
+                  fill="#ffffff"
+                  fill-opacity="0.06"
+                />
+                <text
+                  x="74"
+                  y="337"
+                  fill="#ffffff"
+                  fill-opacity="0.72"
+                  font-size="11.5"
+                  font-weight="600"
+                >
+                  Configuración
+                </text>
+
+                <!-- Usuario en el pie del menú -->
+                <rect
+                  x="16"
+                  y="374"
+                  width="196"
+                  height="56"
+                  rx="14"
+                  fill="#ffffff"
+                  fill-opacity="0.04"
+                />
+                <circle cx="46" cy="402" r="15" fill="url(#brandGrad)" />
+                <circle cx="46" cy="398" r="4.6" fill="#ffffff" />
+                <path d="M36.5 411.5a9.5 9.5 0 0 1 19 0z" fill="#ffffff" />
+                <text
+                  x="70"
+                  y="398"
+                  fill="#ffffff"
+                  fill-opacity="0.85"
+                  font-size="10.5"
+                  font-weight="600"
+                >
+                  Coordinación
+                </text>
+                <text
+                  x="70"
+                  y="412"
+                  fill="#ffffff"
+                  fill-opacity="0.42"
+                  font-size="9"
+                  font-weight="500"
+                >
+                  5 integrantes
+                </text>
+
+                <!-- Encabezado del área principal -->
+                <text
+                  x="268"
+                  y="98"
+                  fill="#ffffff"
+                  font-size="19"
+                  font-weight="800"
+                  letter-spacing="-0.3"
+                >
+                  Inventario de equipos
+                </text>
+                <text
+                  x="268"
+                  y="119"
+                  fill="#ffffff"
+                  fill-opacity="0.5"
+                  font-size="11"
+                  font-weight="500"
+                >
+                  Colegio Compartir · Aula de sistemas
+                </text>
+                <rect x="1010" y="80" width="148" height="34" rx="10" fill="url(#brandGrad)" />
+                <text
+                  x="1084"
+                  y="101"
+                  fill="#ffffff"
+                  font-size="11"
+                  font-weight="700"
+                  text-anchor="middle"
+                >
+                  Registrar equipo
+                </text>
+
+                <!-- Tarjeta: total de equipos -->
+                <rect
+                  x="268"
+                  y="140"
+                  width="210"
+                  height="84"
+                  rx="14"
+                  fill="#ffffff"
+                  fill-opacity="0.04"
+                />
+                <rect
+                  x="268.5"
+                  y="140.5"
+                  width="209"
+                  height="83"
+                  rx="13.5"
+                  fill="none"
+                  stroke="#ffffff"
+                  stroke-opacity="0.08"
+                />
+                <text
+                  x="286"
+                  y="164"
+                  fill="#ffffff"
+                  fill-opacity="0.45"
+                  font-size="10"
+                  font-weight="600"
+                >
+                  Total de equipos
+                </text>
+                <text x="286" y="198" fill="#ffffff" font-size="26" font-weight="800">248</text>
+                <rect
+                  x="418"
+                  y="156"
+                  width="42"
+                  height="20"
+                  rx="10"
+                  fill="#8b5cf6"
+                  fill-opacity="0.2"
+                />
+                <text
+                  x="439"
+                  y="170"
+                  fill="#c4b5fd"
+                  font-size="10"
+                  font-weight="700"
+                  text-anchor="middle"
+                >
+                  100%
+                </text>
+
+                <!-- Tarjeta: operativos -->
+                <rect
+                  x="494"
+                  y="140"
+                  width="210"
+                  height="84"
+                  rx="14"
+                  fill="#ffffff"
+                  fill-opacity="0.04"
+                />
+                <rect
+                  x="494.5"
+                  y="140.5"
+                  width="209"
+                  height="83"
+                  rx="13.5"
+                  fill="none"
+                  stroke="#ffffff"
+                  stroke-opacity="0.08"
+                />
+                <text
+                  x="512"
+                  y="164"
+                  fill="#ffffff"
+                  fill-opacity="0.45"
+                  font-size="10"
+                  font-weight="600"
+                >
+                  Operativos
+                </text>
+                <text x="512" y="198" fill="#ffffff" font-size="26" font-weight="800">221</text>
+                <rect
+                  x="644"
+                  y="156"
+                  width="42"
+                  height="20"
+                  rx="10"
+                  fill="#34d399"
+                  fill-opacity="0.2"
+                />
+                <text
+                  x="665"
+                  y="170"
+                  fill="#6ee7b7"
+                  font-size="10"
+                  font-weight="700"
+                  text-anchor="middle"
+                >
+                  89%
+                </text>
+
+                <!-- Tarjeta: en mantenimiento -->
+                <rect
+                  x="720"
+                  y="140"
+                  width="210"
+                  height="84"
+                  rx="14"
+                  fill="#ffffff"
+                  fill-opacity="0.04"
+                />
+                <rect
+                  x="720.5"
+                  y="140.5"
+                  width="209"
+                  height="83"
+                  rx="13.5"
+                  fill="none"
+                  stroke="#ffffff"
+                  stroke-opacity="0.08"
+                />
+                <text
+                  x="738"
+                  y="164"
+                  fill="#ffffff"
+                  fill-opacity="0.45"
+                  font-size="10"
+                  font-weight="600"
+                >
+                  En mantenimiento
+                </text>
+                <text x="738" y="198" fill="#ffffff" font-size="26" font-weight="800">19</text>
+                <rect
+                  x="870"
+                  y="156"
+                  width="42"
+                  height="20"
+                  rx="10"
+                  fill="#22d3ee"
+                  fill-opacity="0.2"
+                />
+                <text
+                  x="891"
+                  y="170"
+                  fill="#67e8f9"
+                  font-size="10"
+                  font-weight="700"
+                  text-anchor="middle"
+                >
+                  8%
+                </text>
+
+                <!-- Tarjeta: de baja -->
+                <rect
+                  x="946"
+                  y="140"
+                  width="210"
+                  height="84"
+                  rx="14"
+                  fill="#ffffff"
+                  fill-opacity="0.04"
+                />
+                <rect
+                  x="946.5"
+                  y="140.5"
+                  width="209"
+                  height="83"
+                  rx="13.5"
+                  fill="none"
+                  stroke="#ffffff"
+                  stroke-opacity="0.08"
+                />
+                <text
+                  x="964"
+                  y="164"
+                  fill="#ffffff"
+                  fill-opacity="0.45"
+                  font-size="10"
+                  font-weight="600"
+                >
+                  De baja
+                </text>
+                <text x="964" y="198" fill="#ffffff" font-size="26" font-weight="800">8</text>
+                <rect
+                  x="1096"
+                  y="156"
+                  width="42"
+                  height="20"
+                  rx="10"
+                  fill="#fbbf24"
+                  fill-opacity="0.2"
+                />
+                <text
+                  x="1117"
+                  y="170"
+                  fill="#fcd34d"
+                  font-size="10"
+                  font-weight="700"
+                  text-anchor="middle"
+                >
+                  3%
+                </text>
+
+                <!-- Encabezado de la tabla -->
+                <rect
+                  x="268"
+                  y="240"
+                  width="890"
+                  height="32"
+                  rx="10"
+                  fill="#ffffff"
+                  fill-opacity="0.05"
+                />
+                <text
+                  x="282"
+                  y="260"
+                  fill="#ffffff"
+                  fill-opacity="0.4"
+                  font-size="10"
+                  font-weight="700"
+                >
+                  Equipo
+                </text>
+                <text
+                  x="560"
+                  y="260"
+                  fill="#ffffff"
+                  fill-opacity="0.4"
+                  font-size="10"
+                  font-weight="700"
+                >
+                  Código
+                </text>
+                <text
+                  x="700"
+                  y="260"
+                  fill="#ffffff"
+                  fill-opacity="0.4"
+                  font-size="10"
+                  font-weight="700"
+                >
+                  Ubicación
+                </text>
+                <text
+                  x="1004"
+                  y="260"
+                  fill="#ffffff"
+                  fill-opacity="0.4"
+                  font-size="10"
+                  font-weight="700"
+                >
+                  Estado
+                </text>
+
+                <!-- Fila 1 -->
+                <rect
+                  x="268"
+                  y="280"
+                  width="890"
+                  height="34"
+                  rx="10"
+                  fill="#ffffff"
+                  fill-opacity="0.035"
+                />
+                <rect
+                  x="282"
+                  y="286"
+                  width="22"
+                  height="22"
+                  rx="7"
+                  fill="#ffffff"
+                  fill-opacity="0.1"
+                />
+                <text
+                  x="316"
+                  y="301"
+                  fill="#ffffff"
+                  fill-opacity="0.88"
+                  font-size="10.5"
+                  font-weight="600"
+                >
+                  Portátil Lenovo ThinkPad
+                </text>
+                <text
+                  x="560"
+                  y="301"
+                  fill="#ffffff"
+                  fill-opacity="0.55"
+                  font-size="10.5"
+                  font-weight="500"
+                >
+                  SIH-0142
+                </text>
+                <text
+                  x="700"
+                  y="301"
+                  fill="#ffffff"
+                  fill-opacity="0.55"
+                  font-size="10.5"
+                  font-weight="500"
+                >
+                  Aula 204
+                </text>
+                <rect
+                  x="1004"
+                  y="288"
+                  width="110"
+                  height="18"
+                  rx="9"
+                  fill="#34d399"
+                  fill-opacity="0.18"
+                />
+                <circle cx="1018" cy="297" r="3.5" fill="#34d399" />
+                <text x="1028" y="301" fill="#6ee7b7" font-size="10" font-weight="600">
+                  Operativo
+                </text>
+
+                <!-- Fila 2 -->
+                <rect
+                  x="268"
+                  y="322"
+                  width="890"
+                  height="34"
+                  rx="10"
+                  fill="#ffffff"
+                  fill-opacity="0.035"
+                />
+                <rect
+                  x="282"
+                  y="328"
+                  width="22"
+                  height="22"
+                  rx="7"
+                  fill="#ffffff"
+                  fill-opacity="0.1"
+                />
+                <text
+                  x="316"
+                  y="343"
+                  fill="#ffffff"
+                  fill-opacity="0.88"
+                  font-size="10.5"
+                  font-weight="600"
+                >
+                  PC de escritorio HP
+                </text>
+                <text
+                  x="560"
+                  y="343"
+                  fill="#ffffff"
+                  fill-opacity="0.55"
+                  font-size="10.5"
+                  font-weight="500"
+                >
+                  SIH-0087
+                </text>
+                <text
+                  x="700"
+                  y="343"
+                  fill="#ffffff"
+                  fill-opacity="0.55"
+                  font-size="10.5"
+                  font-weight="500"
+                >
+                  Sala TI
+                </text>
+                <rect
+                  x="1004"
+                  y="330"
+                  width="110"
+                  height="18"
+                  rx="9"
+                  fill="#34d399"
+                  fill-opacity="0.18"
+                />
+                <circle cx="1018" cy="339" r="3.5" fill="#34d399" />
+                <text x="1028" y="343" fill="#6ee7b7" font-size="10" font-weight="600">
+                  Operativo
+                </text>
+
+                <!-- Fila 3 -->
+                <rect
+                  x="268"
+                  y="364"
+                  width="890"
+                  height="34"
+                  rx="10"
+                  fill="#ffffff"
+                  fill-opacity="0.035"
+                />
+                <rect
+                  x="282"
+                  y="370"
+                  width="22"
+                  height="22"
+                  rx="7"
+                  fill="#ffffff"
+                  fill-opacity="0.1"
+                />
+                <text
+                  x="316"
+                  y="385"
+                  fill="#ffffff"
+                  fill-opacity="0.88"
+                  font-size="10.5"
+                  font-weight="600"
+                >
+                  Monitor Dell 24&quot;
+                </text>
+                <text
+                  x="560"
+                  y="385"
+                  fill="#ffffff"
+                  fill-opacity="0.55"
+                  font-size="10.5"
+                  font-weight="500"
+                >
+                  SIH-0231
+                </text>
+                <text
+                  x="700"
+                  y="385"
+                  fill="#ffffff"
+                  fill-opacity="0.55"
+                  font-size="10.5"
+                  font-weight="500"
+                >
+                  Aula 101
+                </text>
+                <rect
+                  x="1004"
+                  y="372"
+                  width="110"
+                  height="18"
+                  rx="9"
+                  fill="#22d3ee"
+                  fill-opacity="0.18"
+                />
+                <circle cx="1018" cy="381" r="3.5" fill="#22d3ee" />
+                <text x="1028" y="385" fill="#67e8f9" font-size="10" font-weight="600">
+                  En revisión
+                </text>
+
+                <!-- Fila 4: equipo dado de baja -->
+                <rect
+                  x="268"
+                  y="406"
+                  width="890"
+                  height="34"
+                  rx="10"
+                  fill="#fbbf24"
+                  fill-opacity="0.1"
+                />
+                <rect
+                  x="268.5"
+                  y="406.5"
+                  width="889"
+                  height="33"
+                  rx="9.5"
+                  fill="none"
+                  stroke="#fbbf24"
+                  stroke-opacity="0.38"
+                />
+                <rect
+                  x="282"
+                  y="412"
+                  width="22"
+                  height="22"
+                  rx="7"
+                  fill="#fbbf24"
+                  fill-opacity="0.28"
+                />
+                <text
+                  x="316"
+                  y="427"
+                  fill="#ffffff"
+                  fill-opacity="0.9"
+                  font-size="10.5"
+                  font-weight="600"
+                >
+                  Tablet Samsung Tab
+                </text>
+                <text
+                  x="560"
+                  y="427"
+                  fill="#ffffff"
+                  fill-opacity="0.6"
+                  font-size="10.5"
+                  font-weight="500"
+                >
+                  SIH-0304
+                </text>
+                <text
+                  x="700"
+                  y="427"
+                  fill="#ffffff"
+                  fill-opacity="0.6"
+                  font-size="10.5"
+                  font-weight="500"
+                >
+                  Biblioteca
+                </text>
+                <rect
+                  x="1004"
+                  y="414"
+                  width="110"
+                  height="18"
+                  rx="9"
+                  fill="#fbbf24"
+                  fill-opacity="0.2"
+                />
+                <circle cx="1018" cy="423" r="3.5" fill="#fbbf24" />
+                <text x="1028" y="427" fill="#fcd34d" font-size="10" font-weight="600">
+                  De baja
+                </text>
+              </g>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Estadísticas -->
+      <dl
+        appReveal
+        [appRevealDelay]="460"
+        class="relative z-10 mx-auto -mt-8 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4"
+      >
+        @for (stat of stats; track stat.label) {
+          <div
+            class="group rounded-xl border border-white/10 bg-ink-900/90 p-3 text-center backdrop-blur-md transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-brand-400/50 hover:shadow-[0_18px_40px_-16px_rgba(124,58,237,0.8)]"
+          >
+            <dt class="sr-only">{{ stat.label }}</dt>
+            <dd
+              class="bg-clip-text font-display text-xl font-extrabold text-transparent transition-transform duration-300 group-hover:scale-110"
+              [class]="stat.accent"
+            >
+              {{ stat.value }}
+            </dd>
+            <p class="mt-0.5 text-[0.7rem] font-semibold tracking-wide text-ink-300 uppercase">
+              {{ stat.label }}
+            </p>
+          </div>
+        }
+      </dl>
+    </div>
+  </div>
+</section>

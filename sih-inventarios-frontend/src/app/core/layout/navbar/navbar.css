@@ -1,0 +1,116 @@
+:host {
+  display: contents;
+}
+
+/* Enlaces de navegación con subrayado que crece desde la izquierda.
+   Ahora son <button> (para que el router haga el scroll), así que hay que
+   quitarles el fondo y el borde que el navegador pone por defecto. */
+.nav-link {
+  position: relative;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  height: 2px;
+  width: 100%;
+  border-radius: 9999px;
+  background-image: linear-gradient(90deg, var(--color-brand-500), var(--color-pop-500));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Panel móvil */
+.mobile-panel {
+  animation: panel-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================================================================
+   Modales
+   ================================================================ */
+
+.modal-velo {
+  animation: modal-velo-in 0.25s ease-out both;
+}
+
+.modal-caja {
+  animation: modal-caja-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes modal-velo-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-caja-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* El scroll del modal: en pantallas bajas el formulario es más alto que la
+   ventana, así que la caja se limita y el contenido rueda por dentro. */
+.modal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-brand-500) transparent;
+  overscroll-behavior: contain;
+}
+
+.modal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background-image: linear-gradient(180deg, var(--color-brand-500), var(--color-pop-500));
+}
+
+/* Evita que el fondo se desplace con el dedo sobre un móvil */
+.modal-velo {
+  overscroll-behavior: contain;
+}
+
+/* Respeta la preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-panel,
+  .modal-velo,
+  .modal-caja {
+    animation: none;
+  }
+}

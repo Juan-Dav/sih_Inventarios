@@ -1,0 +1,41 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### Credenciales locales ###
+# Aquí van la contraseña de la base de datos y la clave de firma. Spring Boot lo
+# carga por encima de application.properties, así que el proyecto funciona sin
+# variables de entorno sin que el secreto acabe en GitHub.
+src/main/resources/application-local.properties
+src/main/resources/application-*.local.properties
+*.env
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/

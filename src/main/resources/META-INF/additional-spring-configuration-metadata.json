@@ -1,0 +1,50 @@
+{
+  "properties": [
+    {
+      "name": "app.jwt.secret",
+      "type": "java.lang.String",
+      "description": "Clave de firma de los tokens JWT. HS256 exige al menos 256 bits (32 bytes). En produccion debe inyectarse desde una variable de entorno, no desde el properties."
+    },
+    {
+      "name": "app.jwt.expiration-ms",
+      "type": "java.lang.Long",
+      "description": "Duracion de la validez del token JWT, en milisegundos. 86400000 equivale a 24 horas."
+    },
+    {
+      "name": "app.bootstrap.admin.activado",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Si es true, al arrancar se crea una cuenta ADMINISTRADOR de respaldo cuando todavia no existe ninguna. Se deja en false porque el registro publico ya permite elegir el rol ADMINISTRADOR y esa cuenta sobra."
+    },
+    {
+      "name": "app.bootstrap.admin.correo",
+      "type": "java.lang.String",
+      "defaultValue": "admin@sih.local",
+      "description": "Correo de la cuenta de administrador de respaldo. Solo se usa si app.bootstrap.admin.activado esta en true."
+    },
+    {
+      "name": "app.bootstrap.admin.contrasena",
+      "type": "java.lang.String",
+      "defaultValue": "admin123",
+      "description": "Contrasena de la cuenta de administrador de respaldo. Solo se usa si app.bootstrap.admin.activado esta en true; la clase la cifra con BCrypt antes de guardarla."
+    },
+    {
+      "name": "app.plan.gratuito.max-salas",
+      "type": "java.lang.Integer",
+      "defaultValue": 2,
+      "description": "Numero maximo de aulas que admite el plan gratuito. En el plan Premium no se aplica ningun tope."
+    },
+    {
+      "name": "app.plan.gratuito.max-equipos-por-sala",
+      "type": "java.lang.Integer",
+      "defaultValue": 12,
+      "description": "Numero maximo de equipos que admite cada aula en el plan gratuito. En el plan Premium no se aplica ningun tope."
+    },
+    {
+      "name": "app.plan.premium.precio",
+      "type": "java.lang.Long",
+      "defaultValue": 150000,
+      "description": "Precio del plan Premium en pesos colombianos. La compra es simulada: no hay pasarela de pago detras."
+    }
+  ]
+}

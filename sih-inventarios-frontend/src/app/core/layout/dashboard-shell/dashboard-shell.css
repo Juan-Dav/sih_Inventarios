@@ -1,0 +1,94 @@
+:host {
+  display: block;
+}
+
+/*
+ * El ítem activo se marca con un relleno claro y texto oscuro, al revés que
+ * antes. Sobre la barra lateral clara el texto invertido quedaba ilegible; y
+ * ahora que el panel es oscuro, un relleno claro es lo que destaca de verdad.
+ */
+.item-activo {
+  background-color: rgb(255 255 255 / 0.9);
+  box-shadow:
+    0 12px 28px -16px rgb(0 0 0 / 0.6),
+    0 0 0 1px rgb(255 255 255 / 0.9) inset;
+}
+
+.item-activo :is(.texto-item, .texto-desc) {
+  color: #0b1020;
+  font-weight: 700;
+}
+
+.item-activo .caja-icono {
+  background-color: rgb(255 255 255 / 0.9);
+  color: #0b1020;
+}
+
+.item-activo .insignia {
+  background-color: rgb(226 232 240 / 0.9);
+  color: #1e293b;
+}
+
+/* Barra de acento con el color del rol; solo se ve en el ítem activo. */
+.barra-acento {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.item-activo .barra-acento {
+  opacity: 1;
+}
+
+/*
+ * La barra lateral tiene alto máximo y su propio scroll. Sin esto, con seis o
+ * siete módulos el menú crecía más que la ventana y la cabecera fija quedaba
+ * pegada arriba de un bloque larguísimo sin nada al lado.
+ */
+.scroll-fino {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.22) transparent;
+}
+
+.scroll-fino::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-fino::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-fino::-webkit-scrollbar-thumb {
+  background-color: rgb(255 255 255 / 0.22);
+  border-radius: 999px;
+}
+
+.scroll-fino::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(255 255 255 / 0.36);
+}
+
+/*
+ * En pantallas chicas la barra lateral deja de ser columna y pasa a ser una
+ * lista horizontal con scroll, para no empujar el contenido hacia abajo.
+ */
+@media (max-width: 1023px) {
+  .menu-panel {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .menu-panel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .menu-item {
+    min-width: max-content;
+  }
+}
+
+/* Respeta la preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .barra-acento,
+  .menu-item {
+    transition: none;
+  }
+}

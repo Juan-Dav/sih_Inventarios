@@ -1,0 +1,92 @@
+:host {
+  display: block;
+}
+
+/* Orbes de color en movimiento.
+   Antes usaban `filter: blur(64px)`, que obliga al navegador a repintar un
+   desenfoque gaussiano de 64px en cada fotograma. Ahora el mismo degradado
+   suave se pinta con un radial-gradient estático: mismo aspecto, coste
+   de pintado una sola vez y solo transformaciones en el compositor. */
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  will-change: transform;
+  background-image: radial-gradient(
+    circle at 50% 50%,
+    var(--orb-color) 0%,
+    var(--orb-color) 34%,
+    rgb(0 0 0 / 0) 72%
+  );
+}
+
+.orb-brand {
+  --orb-color: rgb(139 92 246 / 0.55);
+}
+
+.orb-pop {
+  --orb-color: rgb(217 70 239 / 0.45);
+}
+
+.orb-aqua {
+  --orb-color: rgb(6 182 212 / 0.35);
+}
+
+/* Marco de la imagen: degradado fijo de la marca.
+   El borde antes era un conic-gradient con `animation: spin-border infinite`,
+   que repintaba un elemento de ~1600px en cada fotograma. */
+.frame {
+  position: relative;
+  padding: 2px;
+  border-radius: 1rem;
+  background-image: linear-gradient(
+    120deg,
+    var(--color-brand-500),
+    var(--color-pop-500),
+    var(--color-sun-400),
+    var(--color-aqua-400),
+    var(--color-brand-500)
+  );
+}
+
+.frame-inner {
+  position: relative;
+  overflow: hidden;
+  border-radius: calc(1rem - 2px);
+  background-color: var(--color-ink-950);
+}
+
+/* El panel del mockup se amplía suavemente al pasar el cursor. */
+.mockup {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.mockup-panel {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 1.2s ease-out;
+}
+
+.group:hover .mockup-panel {
+  transform: scale(1.03);
+}
+
+/* Etiqueta flotante sobre la imagen */
+.chip {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  background: rgb(8 10 24 / 0.7);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 10px 30px -8px rgb(0 0 0 / 0.6);
+  backdrop-filter: blur(12px);
+}

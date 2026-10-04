@@ -1,0 +1,287 @@
+/*
+ * Estilos compartidos por los módulos de los paneles.
+ *
+ * Vive aquí y no en `styles.css` a propósito: son clases de composición de las
+ * pantallas internas, no parte del diseño público del sitio.
+ *
+ * Los valores se resuelven con variables, no con colores fijos, porque dentro
+ * del panel los tokens de `ink` están invertidos por el tema oscuro: `ink-200`
+ * es el borde de las cajas y `ink-100` el fondo del campo. Si se dejara el
+ * blanco fijo de antes, cada tarjeta, cada input y cada tabla saldría como un
+ * bloque blanco dentro de un panel oscuro.
+ */
+
+.tarjeta {
+  border-radius: 1.5rem;
+  border: 1px solid var(--color-ink-200);
+  background-color: rgb(255 255 255 / 0.05);
+  padding: 1.5rem;
+  box-shadow: 0 18px 44px -28px rgb(0 0 0 / 0.7);
+  backdrop-filter: blur(12px);
+}
+
+.titulo-modulo {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-ink-900);
+  letter-spacing: -0.01em;
+}
+
+.subtitulo-modulo {
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-ink-500);
+}
+
+.rotulo {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-ink-500);
+}
+
+.campo {
+  width: 100%;
+  border-radius: 0.875rem;
+  border: 1px solid var(--color-ink-200);
+  background-color: rgb(255 255 255 / 0.06);
+  padding: 0.6875rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--color-ink-900);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.campo::placeholder {
+  color: var(--color-ink-400);
+}
+
+.campo:hover:not(:disabled) {
+  border-color: var(--color-ink-300);
+}
+
+.campo:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--color-brand-500);
+}
+
+.campo:disabled {
+  cursor: not-allowed;
+  background-color: var(--color-ink-100);
+  color: var(--color-ink-400);
+}
+
+select.campo {
+  appearance: none;
+  /* El color de la flecha va incrustado en el SVG (fill=%23b3bed4), que es el
+     `ink-500` del tema oscuro del panel. Hay que actualizarlo a mano si cambia
+     ese token: por eso el comentario. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23b3bed4'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.625rem center;
+  background-size: 1.15em;
+  padding-right: 2.25rem;
+}
+
+/*
+ * Opciones del desplegable: el `<select>` no puede arreglarse con `color` solo.
+ *
+ * La lista que se abre al pulsar la flecha la dibuja el navegador con su propio
+ * fondo opaco (el del sistema, claro) y no con el del `<select>`, que aquí es
+ * translúcido. Como las opciones heredan el `color` del campo, en el panel
+ * oscuro salían en blanco sobre blanco: los nombres del aula, del estado y del
+ * usuario no se leían al elegir.
+ *
+ * El fondo se toma de `ink-100` y el texto de `ink-900` porque esa escala está
+ * invertida dentro de `.tema-panel`: los dos valores son una superficie y su
+ * texto de contraste tanto en el panel oscuro como en el tema claro.
+ */
+.campo option {
+  background-color: var(--color-ink-100);
+  color: var(--color-ink-900);
+}
+
+.campo option:hover,
+.campo option:focus {
+  background-color: var(--color-ink-200);
+  color: var(--color-ink-900);
+}
+
+/* La opción elegida necesita un color propio: si no, el navegador la pinta con
+   el azul del sistema y el texto claro deja de leerse. */
+.campo option:checked {
+  background-color: var(--color-brand-500);
+  color: #ffffff;
+}
+
+.botón {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.875rem;
+  padding: 0.6875rem 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.botón:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.botón:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+/*
+ * Acción secundaria: cancelar, actualizar, editar.
+ *
+ * Antes estas botones se componían con utilidades sueltas (`bg-ink-100
+ * text-ink-600`), y el resultado dependedía del orden de las clases de
+ * Tailwind: el texto salía con el tono del tema claro sobre el fondo del tema
+ * oscuro y quedaba prácticamente ilegible. Aquí los colores van fijos dentro de
+ * la clase y no dependen de qué token herede.
+ *
+ * El texto va en `#eef2ff` sobre un relleno translúcido: los tres valores se
+ * calculan sobre el fondo real de la tarjeta, así que el contraste se mantiene
+ * en los cuatro temas de rol sin tocar el color en cada uno.
+ */
+.boton-secundario {
+  border: 1px solid rgb(255 255 255 / 0.16);
+  background-color: rgb(255 255 255 / 0.08);
+  color: #eef2ff;
+  font-weight: 700;
+}
+
+.boton-secundario:hover:not(:disabled) {
+  border-color: rgb(255 255 255 / 0.3);
+  background-color: rgb(255 255 255 / 0.14);
+  color: #ffffff;
+}
+
+.boton-secundario:focus-visible {
+  outline: 2px solid var(--panel-anillo);
+  outline-offset: 2px;
+}
+
+/* Versión compacta para los botones de fila de las tablas. */
+.boton-fila {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.7rem;
+  border-radius: 0.625rem;
+}
+
+/* Acción de acento del rol, para el botón que sí manda: actualizar. */
+.boton-acento {
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background-color: rgb(255 255 255 / 0.08);
+  color: var(--panel-acento);
+  font-weight: 700;
+}
+
+.boton-acento:hover:not(:disabled) {
+  border-color: rgb(255 255 255 / 0.32);
+  background-color: rgb(255 255 255 / 0.15);
+  color: #ffffff;
+}
+
+.boton-acento:focus-visible {
+  outline: 2px solid var(--panel-anillo);
+  outline-offset: 2px;
+}
+
+.tabla-envoltura {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.tabla thead th {
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-ink-400);
+  border-bottom: 1px solid var(--color-ink-100);
+  white-space: nowrap;
+}
+
+.tabla tbody td {
+  padding: 0.875rem;
+  border-bottom: 1px solid var(--color-ink-100);
+  vertical-align: middle;
+}
+
+.tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.tabla tbody tr:hover {
+  background-color: rgb(255 255 255 / 0.06);
+}
+
+.etiqueta-estado {
+  display: inline-block;
+  border-radius: 9999px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.vacio {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.vacio h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-ink-800);
+}
+
+.vacio p {
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--color-ink-500);
+}
+
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  border-radius: 1rem;
+  padding: 0.75rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .tarjeta {
+    padding: 1.25rem;
+  }
+}
