@@ -123,4 +123,16 @@ public class EquipoController {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
+
+    // Elimina un equipo. Solo técnicos y administradores.
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'TECNICO')")
+    public ResponseEntity<?> eliminarEquipo(@PathVariable Long id) {
+        try {
+            equipoService.eliminarEquipo(id);
+            return ResponseEntity.ok(Map.of("message", "Equipo eliminado correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }

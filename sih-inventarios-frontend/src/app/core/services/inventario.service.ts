@@ -281,6 +281,20 @@ export class InventarioService {
     );
   }
 
+  /** Elimina un aula. */
+  eliminarSala(id: number): Observable<any> {
+    return this.http.delete(`${API_SALAS}/${id}`).pipe(
+      tap(() => this._salas.update((lista) => lista.filter((sala) => sala.id !== id))),
+    );
+  }
+
+  /** Elimina un equipo. */
+  eliminarEquipo(id: number): Observable<any> {
+    return this.http.delete(`${API_EQUIPOS}/${id}`).pipe(
+      tap(() => this._equipos.update((lista) => lista.filter((equipo) => equipo.id !== id))),
+    );
+  }
+
   /* --------------------------- Cambios de estado --------------------------- */
 
   /** Pasa una falla a RESUELTO, EN_REVISION o PENDIENTE. */

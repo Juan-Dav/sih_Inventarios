@@ -1,7 +1,9 @@
 package com.sih_inventarios_backend.service;
 
 import com.sih_inventarios_backend.entity.Sala;
+import com.sih_inventarios_backend.repository.EquipoRepository;
 import com.sih_inventarios_backend.repository.SalaRepository;
+import com.sih_inventarios_backend.repository.VerificacionRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -11,10 +13,16 @@ public class SalaService {
     private final SalaRepository salaRepository;
 
     private final PlanService planService;
+    private final EquipoRepository equipoRepository;
+    private final VerificacionRepository verificacionRepository;
 
-    public SalaService(SalaRepository salaRepository, PlanService planService) {
+    public SalaService(SalaRepository salaRepository, PlanService planService,
+                      EquipoRepository equipoRepository,
+                      VerificacionRepository verificacionRepository) {
         this.salaRepository = salaRepository;
         this.planService = planService;
+        this.equipoRepository = equipoRepository;
+        this.verificacionRepository = verificacionRepository;
     }
 
     /**
@@ -49,5 +57,17 @@ public class SalaService {
 
     public List<Sala> obtenerTodas() {
         return salaRepository.findAll();
+    }
+
+    public void eliminarSala(Long id) {
+        Sala sala = salaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Error: La sala no existe."));
+        long cantidadEquipos = equipoRepository.countBySalaId(id);
+        if (cantidadEquipos > 0) {
+            throw new RuntimeException("No se puede eliminar la sala porque tiene " + cantidadEquipos + " equipo(s) asociado(s). Primero elimine los equipos.");
+        }
+        // Eliminar verificaciones asociadas a la sala
+        verificacionRepository.deleteAll(verificacionRepository.findBySalaIdOrderByFechaVerificacionDesc(id));
+        salaRepository.delete(sala);
     }
 }

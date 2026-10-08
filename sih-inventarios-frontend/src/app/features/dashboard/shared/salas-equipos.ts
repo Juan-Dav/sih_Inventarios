@@ -701,6 +701,23 @@ export class SalasEquipos implements OnInit {
     this.sala = { nombre: aula.nombre, capacidadMaxima: aula.capacidadMaxima };
   }
 
+  protected eliminarSala(aula: Sala): void {
+    this.aviso.set(null);
+    if (confirm(`¿Estás seguro de eliminar el aula "${aula.nombre}"?`)) {
+      this.operando.set(true);
+      this.inventario.eliminarSala(aula.id).subscribe({
+        next: () => {
+          this.operando.set(false);
+          this.aviso.set({ tipo: 'exito', texto: `Aula "${aula.nombre}" eliminada.` });
+        },
+        error: (error: unknown) => {
+          this.operando.set(false);
+          this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
+        },
+      });
+    }
+  }
+
   protected cancelarEdicionSala(): void {
     this.editandoSala.set(null);
     this.sala = { nombre: '', capacidadMaxima: 12 };
@@ -718,6 +735,23 @@ export class SalasEquipos implements OnInit {
       modelo: equipo.modelo ?? '',
       estado: equipo.estado,
     };
+  }
+
+  protected eliminarEquipo(item: Equipo): void {
+    this.aviso.set(null);
+    if (confirm(`¿Estás seguro de eliminar el equipo "${item.codigo}"?`)) {
+      this.operando.set(true);
+      this.inventario.eliminarEquipo(item.id).subscribe({
+        next: () => {
+          this.operando.set(false);
+          this.aviso.set({ tipo: 'exito', texto: `Equipo "${item.codigo}" eliminado.` });
+        },
+        error: (error: unknown) => {
+          this.operando.set(false);
+          this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
+        },
+      });
+    }
   }
 
   protected cancelarEdicionEquipo(): void {

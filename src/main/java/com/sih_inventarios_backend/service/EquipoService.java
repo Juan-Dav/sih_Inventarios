@@ -186,4 +186,14 @@ public class EquipoService {
 
     private static final List<String> ESTADOS =
             List.of("OPERATIVO", "EN_MANTENIMIENTO", FUERA_DE_SERVICIO);
+
+    @Transactional
+    public void eliminarEquipo(Long id) {
+        Equipo equipo = equipoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Error: El equipo no existe."));
+        // Eliminar registros asociados para evitar errores de clave foránea
+        mantenimientoRepository.deleteAll(mantenimientoRepository.findByEquipoIdOrderByFechaMantenimientoDesc(id));
+        fallaRepository.deleteAll(fallaRepository.findByEquipoIdOrderByFechaReporteDesc(id));
+        equipoRepository.delete(equipo);
+    }
 }

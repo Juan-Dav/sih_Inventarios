@@ -67,4 +67,16 @@ public class SalaController {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
+
+    // Elimina una sala. Solo técnicos y administradores.
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'TECNICO')")
+    public ResponseEntity<?> eliminarSala(@PathVariable Long id) {
+        try {
+            salaService.eliminarSala(id);
+            return ResponseEntity.ok(Map.of("message", "Sala eliminada correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }
