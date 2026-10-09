@@ -742,20 +742,23 @@ export class SalasEquipos implements OnInit {
       id: aula.id,
       nombre: aula.nombre,
       mensaje: `¿Quieres eliminar esta aula "${aula.nombre}"?`,
-      accion: () => this.ejecutarEliminarSala(aula.id, aula.nombre),
+      accion: () => {
+        this.ejecutarEliminarSala(aula.id, aula.nombre);
+      },
     });
   }
 
   private ejecutarEliminarSala(id: number, nombre: string): void {
-    this.confirmacion.set(null);
     this.operando.set(true);
     this.inventario.eliminarSala(id).subscribe({
       next: () => {
         this.operando.set(false);
+        this.confirmacion.set(null);
         this.aviso.set({ tipo: 'exito', texto: `Aula "${nombre}" eliminada.` });
       },
       error: (error: unknown) => {
         this.operando.set(false);
+        this.confirmacion.set(null);
         this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
       },
     });
@@ -787,20 +790,23 @@ export class SalasEquipos implements OnInit {
       id: item.id,
       nombre: item.codigo,
       mensaje: `¿Quieres eliminar este equipo "${item.codigo}"?`,
-      accion: () => this.ejecutarEliminarEquipo(item.id, item.codigo),
+      accion: () => {
+        this.ejecutarEliminarEquipo(item.id, item.codigo);
+      },
     });
   }
 
   private ejecutarEliminarEquipo(id: number, codigo: string): void {
-    this.confirmacion.set(null);
     this.operando.set(true);
     this.inventario.eliminarEquipo(id).subscribe({
       next: () => {
         this.operando.set(false);
+        this.confirmacion.set(null);
         this.aviso.set({ tipo: 'exito', texto: `Equipo "${codigo}" eliminado.` });
       },
       error: (error: unknown) => {
         this.operando.set(false);
+        this.confirmacion.set(null);
         this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
       },
     });
