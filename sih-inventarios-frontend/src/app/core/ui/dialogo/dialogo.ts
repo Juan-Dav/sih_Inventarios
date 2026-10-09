@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-export type DialogoTipo = 'exito' | 'error' | 'info';
+export type DialogoTipo = 'exito' | 'error' | 'info' | 'pregunta';
 
 /**
  * Diálogo de resultado reutilizable.
@@ -23,6 +23,9 @@ export class Dialogo {
   readonly titulo = input.required<string>();
   readonly mensaje = input('');
   readonly textoAccion = input('Entendido');
+  readonly textoCancelar = input('Cancelar');
+  readonly mostrarCancelar = input(false);
 
   readonly cerrado = output<void>();
+  readonly confirmar = output<void>();
 }

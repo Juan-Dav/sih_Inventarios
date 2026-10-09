@@ -12,8 +12,17 @@ import {
 import { InventarioService } from '../../../core/services/inventario.service';
 import { PlanService } from '../../../core/services/plan.service';
 import { Kpi } from '../../../core/ui/kpi/kpi';
+import { Dialogo } from '../../../core/ui/dialogo/dialogo';
 
 type Aviso = { tipo: 'exito' | 'error'; texto: string };
+
+type Confirmacion = {
+  tipo: 'sala' | 'equipo';
+  id: number;
+  nombre: string;
+  mensaje: string;
+  accion: () => void;
+};
 
 /**
  * Módulo de aulas y equipos, compartido por los tres paneles.
@@ -26,7 +35,7 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
  */
 @Component({
   selector: 'app-salas-equipos',
-  imports: [FormsModule, Kpi],
+  imports: [FormsModule, Kpi, Dialogo],
   styleUrls: ['../../../core/ui/formulario.css'],
   template: `
     <div class="flex flex-col gap-6">
@@ -570,6 +579,7 @@ export class SalasEquipos implements OnInit {
   protected readonly cambiandoEstado = signal(false);
   protected readonly operando = signal(false);
   protected readonly aviso = signal<Aviso | null>(null);
+  protected readonly confirmacion = signal<Confirmacion | null>(null);
 
   protected sala = { nombre: '', capacidadMaxima: 12 };
 
@@ -719,19 +729,36 @@ export class SalasEquipos implements OnInit {
 
   protected eliminarSala(aula: Sala): void {
     this.aviso.set(null);
-    if (confirm(`¿Estás seguro de eliminar el aula "${aula.nombre}"?`)) {
-      this.operando.set(true);
-      this.inventario.eliminarSala(aula.id).subscribe({
-        next: () => {
-          this.operando.set(false);
-          this.aviso.set({ tipo: 'exito', texto: `Aula "${aula.nombre}" eliminada.` });
-        },
-        error: (error: unknown) => {
-          this.operando.set(false);
-          this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
-        },
+    const tieneEquipos = this.equiposDe(aula.id) > 0;
+    if (tieneEquipos) {
+      this.aviso.set({
+        tipo: 'error',
+        texto: 'No se puede eliminar un aula con equipos adentro.',
       });
+      return;
     }
+    this.confirmacion.set({
+      tipo: 'sala',
+      id: aula.id,
+      nombre: aula.nombre,
+      mensaje: `¿Quieres eliminar esta aula "${aula.nombre}"?`,
+      accion: () => this.ejecutarEliminarSala(aula.id, aula.nombre),
+    });
+  }
+
+  private ejecutarEliminarSala(id: number, nombre: string): void {
+    this.confirmacion.set(null);
+    this.operando.set(true);
+    this.inventario.eliminarSala(id).subscribe({
+      next: () => {
+        this.operando.set(false);
+        this.aviso.set({ tipo: 'exito', texto: `Aula "${nombre}" eliminada.` });
+      },
+      error: (error: unknown) => {
+        this.operando.set(false);
+        this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
+      },
+    });
   }
 
   protected cancelarEdicionSala(): void {
@@ -755,19 +782,28 @@ export class SalasEquipos implements OnInit {
 
   protected eliminarEquipo(item: Equipo): void {
     this.aviso.set(null);
-    if (confirm(`¿Estás seguro de eliminar el equipo "${item.codigo}"?`)) {
-      this.operando.set(true);
-      this.inventario.eliminarEquipo(item.id).subscribe({
-        next: () => {
-          this.operando.set(false);
-          this.aviso.set({ tipo: 'exito', texto: `Equipo "${item.codigo}" eliminado.` });
-        },
-        error: (error: unknown) => {
-          this.operando.set(false);
-          this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
-        },
-      });
-    }
+    this.confirmacion.set({
+      tipo: 'equipo',
+      id: item.id,
+      nombre: item.codigo,
+      mensaje: `¿Quieres eliminar este equipo "${item.codigo}"?`,
+      accion: () => this.ejecutarEliminarEquipo(item.id, item.codigo),
+    });
+  }
+
+  private ejecutarEliminarEquipo(id: number, codigo: string): void {
+    this.confirmacion.set(null);
+    this.operando.set(true);
+    this.inventario.eliminarEquipo(id).subscribe({
+      next: () => {
+        this.operando.set(false);
+        this.aviso.set({ tipo: 'exito', texto: `Equipo "${codigo}" eliminado.` });
+      },
+      error: (error: unknown) => {
+        this.operando.set(false);
+        this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
+      },
+    });
   }
 
   protected cancelarEdicionEquipo(): void {

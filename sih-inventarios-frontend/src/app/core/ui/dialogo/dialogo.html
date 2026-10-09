@@ -77,6 +77,18 @@
             </defs>
           </svg>
         }
+        @case ('pregunta') {
+          <svg viewBox="0 0 72 72" fill="none" class="h-20 w-20" aria-hidden="true">
+            <circle cx="36" cy="36" r="32" fill="url(#gradInfo)" />
+            <text x="36" y="45" text-anchor="middle" font-size="38" font-weight="bold" fill="#0f172a">?</text>
+            <defs>
+              <linearGradient id="gradInfo" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#60a5fa" />
+                <stop offset="100%" stop-color="#a78bfa" />
+              </linearGradient>
+            </defs>
+          </svg>
+        }
         @default {
           <!-- Saludo: avatar con las iniciales -->
           <div class="avatar">
@@ -100,12 +112,31 @@
     <!-- Contenido extra (rol, listas de campos faltantes, etc.) -->
     <ng-content />
 
-    <button
-      type="button"
-      (click)="cerrado.emit()"
-      class="btn-glow mt-6 w-full px-5 py-3 text-sm tracking-wide"
-    >
-      {{ textoAccion() }}
-    </button>
+    @if (tipo() === 'pregunta') {
+      <div class="mt-6 flex flex-col gap-2 sm:flex-row">
+        <button
+          type="button"
+          (click)="cerrado.emit()"
+          class="botón boton-secundario w-full px-5 py-3 text-sm tracking-wide"
+        >
+          {{ textoCancelar() }}
+        </button>
+        <button
+          type="button"
+          (click)="confirmar.emit()"
+          class="btn-glow w-full px-5 py-3 text-sm tracking-wide"
+        >
+          {{ textoAccion() }}
+        </button>
+      </div>
+    } @else {
+      <button
+        type="button"
+        (click)="cerrado.emit()"
+        class="btn-glow mt-6 w-full px-5 py-3 text-sm tracking-wide"
+      >
+        {{ textoAccion() }}
+      </button>
+    }
   </div>
 </div>
