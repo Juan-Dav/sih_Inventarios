@@ -1,0 +1,36 @@
+[33m❯[39m Building...
+[32m✔[39m Building...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m             [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-AYN2X2AM.js[39m  [2m | [22m[2m-[22m                 [2m | [22m[36m173.15 kB[39m[2m | [22m               [36m51.31 kB[39m
+[32mchunk-72Q5UHI2.js[39m  [2m | [22m[2m-[22m                 [2m | [22m [36m96.17 kB[39m[2m | [22m               [36m24.30 kB[39m
+[32mstyles-Y7W5SSCK.css[39m[2m | [22m[2mstyles[22m            [2m | [22m [36m75.96 kB[39m[2m | [22m                [36m9.44 kB[39m
+[32mchunk-GRY4ROWO.js[39m  [2m | [22m[2m-[22m                 [2m | [22m [36m37.21 kB[39m[2m | [22m                [36m7.74 kB[39m
+[32mmain-HBTM2FKO.js[39m   [2m | [22m[2mmain[22m              [2m | [22m [36m33.92 kB[39m[2m | [22m                [36m8.26 kB[39m
+[32mchunk-IK6SHYZN.js[39m  [2m | [22m[2m-[22m                 [2m | [22m [36m27.47 kB[39m[2m | [22m                [36m8.42 kB[39m
+[32mchunk-FQCSYU3Q.js[39m  [2m | [22m[2m-[22m                 [2m | [22m  [36m5.25 kB[39m[2m | [22m                [36m1.74 kB[39m
+
+[1m [22m                  [2m | [22m[1mInitial total[22m     [2m | [22m[1m449.12 kB[22m[2m | [22m              [1m111.21 kB[22m
+
+[1mLazy chunk files[22m   [2m | [22m[1mNames[22m             [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-JAXLDY5F.js[39m  [2m | [22m[2mhome-page[22m         [2m | [22m [36m44.57 kB[39m[2m | [22m                [36m9.54 kB[39m
+[32mchunk-ZT63MYA4.js[39m  [2m | [22m[2msalas-equipos[22m     [2m | [22m [36m26.06 kB[39m[2m | [22m                [36m6.49 kB[39m
+[32mchunk-4RNLDTZ6.js[39m  [2m | [22m[2mverificacion[22m      [2m | [22m [36m17.94 kB[39m[2m | [22m                [36m4.86 kB[39m
+[32mchunk-RQMTCPHB.js[39m  [2m | [22m[2m-[22m                 [2m | [22m [36m16.89 kB[39m[2m | [22m                [36m4.68 kB[39m
+[32mchunk-XUQYISW6.js[39m  [2m | [22m[2mfallas-tecnico[22m    [2m | [22m [36m15.24 kB[39m[2m | [22m                [36m4.34 kB[39m
+[32mchunk-YCKZKAL7.js[39m  [2m | [22m[2musuarios-plan[22m     [2m | [22m [36m14.90 kB[39m[2m | [22m                [36m4.20 kB[39m
+[32mchunk-5Z2H4TJA.js[39m  [2m | [22m[2mfallas-docente[22m    [2m | [22m [36m13.75 kB[39m[2m | [22m                [36m4.02 kB[39m
+[32mchunk-PWWKDWUP.js[39m  [2m | [22m[2m-[22m                 [2m | [22m [36m12.23 kB[39m[2m | [22m                [36m4.10 kB[39m
+[32mchunk-SJWPVA6Q.js[39m  [2m | [22m[2minventario-general[22m[2m | [22m [36m12.14 kB[39m[2m | [22m                [36m3.47 kB[39m
+[32mchunk-ZLRARLOM.js[39m  [2m | [22m[2mhistorial-equipos[22m [2m | [22m [36m11.49 kB[39m[2m | [22m                [36m3.38 kB[39m
+[32mchunk-3KVZBDQC.js[39m  [2m | [22m[2m-[22m                 [2m | [22m  [36m4.60 kB[39m[2m | [22m                [36m1.39 kB[39m
+[32mchunk-LJBY6TDO.js[39m  [2m | [22m[2m-[22m                 [2m | [22m  [36m1.96 kB[39m[2m | [22m              [36m889 bytes[39m
+[32mchunk-EQE47NNN.js[39m  [2m | [22m[2m-[22m                 [2m | [22m  [36m1.80 kB[39m[2m | [22m              [36m665 bytes[39m
+[32mchunk-3GKECLOP.js[39m  [2m | [22m[2mdashboard-tecnico[22m [2m | [22m  [36m1.68 kB[39m[2m | [22m              [36m749 bytes[39m
+[32mchunk-GFJQ2Y3T.js[39m  [2m | [22m[2mdashboard-admin[22m   [2m | [22m  [36m1.58 kB[39m[2m | [22m              [36m731 bytes[39m
+[2m...and 3 more lazy chunks files. Use "--verbose" to show all the files.[22m
+
+[35mPrerendered 0 static routes.[39m
+Application bundle generation complete. [58.417 seconds] - 2026-10-09T03:42:54.042Z
+
+Output location: C:\Users\LEIDY\Desktop\Practicas\sih-inventarios-backend\sih-inventarios-frontend\dist\sih-inventarios-frontend
+

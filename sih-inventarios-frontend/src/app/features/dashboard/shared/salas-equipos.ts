@@ -346,7 +346,7 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                   @for (aula of inventario.salas(); track aula.id) {
                     <tr>
                       <td>
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
                           <span class="font-bold text-ink-900">{{ aula.nombre }}</span>
                           @if (permiteEditar()) {
                             <button
@@ -356,6 +356,14 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                               (click)="editarSala(aula)"
                             >
                               Editar
+                            </button>
+                            <button
+                              type="button"
+                              class="botón boton-fila border border-pop-400/40 bg-pop-500/15 text-[#f9a8d4] hover:bg-pop-500/25"
+                              [disabled]="operando()"
+                              (click)="eliminarSala(aula)"
+                            >
+                              Eliminar
                             </button>
                           }
                         </div>
@@ -442,7 +450,7 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                       <td class="text-ink-600">{{ item.sala.nombre }}</td>
                       <td class="max-w-sm text-ink-600">{{ item.caracteristicas || '—' }}</td>
                       <td>
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
                           <span class="etiqueta-estado" [class]="estilo(item.estado).clases">
                             {{ estilo(item.estado).texto }}
                           </span>
@@ -477,6 +485,14 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                               (click)="editarEquipo(item)"
                             >
                               Editar
+                            </button>
+                            <button
+                              type="button"
+                              class="botón boton-fila border border-pop-400/40 bg-pop-500/15 text-[#f9a8d4] hover:bg-pop-500/25"
+                              [disabled]="operando()"
+                              (click)="eliminarEquipo(item)"
+                            >
+                              Eliminar
                             </button>
                           }
                         </div>
