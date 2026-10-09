@@ -52,13 +52,18 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
-              "ssr": false
+              "ssr": false,
+              "namedChunks": true
             }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "hmr": false,
+            "poll": 2000
+          },
           "configurations": {
             "production": {
               "buildTarget": "sih-inventarios-frontend:build:production"
