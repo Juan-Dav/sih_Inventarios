@@ -12,17 +12,11 @@ import {
 import { InventarioService } from '../../../core/services/inventario.service';
 import { PlanService } from '../../../core/services/plan.service';
 import { Kpi } from '../../../core/ui/kpi/kpi';
-import { Dialogo } from '../../../core/ui/dialogo/dialogo';
+
 
 type Aviso = { tipo: 'exito' | 'error'; texto: string };
 
-type Confirmacion = {
-  tipo: 'sala' | 'equipo';
-  id: number;
-  nombre: string;
-  mensaje: string;
-  accion: () => void;
-};
+
 
 /**
  * Módulo de aulas y equipos, compartido por los tres paneles.
@@ -35,7 +29,7 @@ type Confirmacion = {
  */
 @Component({
   selector: 'app-salas-equipos',
-  imports: [FormsModule, Kpi, Dialogo],
+  imports: [FormsModule, Kpi],
   styleUrls: ['../../../core/ui/formulario.css'],
   template: `
     <div class="flex flex-col gap-6">
@@ -135,6 +129,14 @@ type Confirmacion = {
                   </button>
 
                   @if (editandoSala()) {
+                    <button
+                      type="button"
+                      class="botón boton-fila border border-pop-400/40 bg-pop-500/15 text-[#f9a8d4] hover:bg-pop-500/25"
+                      [disabled]="guardandoSala()"
+                      (click)="eliminarSala(editandoSala()!)"
+                    >
+                      Eliminar aula
+                    </button>
                     <button
                       type="button"
                       class="botón boton-secundario"
@@ -281,6 +283,14 @@ type Confirmacion = {
                   @if (editandoEquipo()) {
                     <button
                       type="button"
+                      class="botón boton-fila border border-pop-400/40 bg-pop-500/15 text-[#f9a8d4] hover:bg-pop-500/25"
+                      [disabled]="guardandoEquipo()"
+                      (click)="eliminarEquipo(editandoEquipo()!)"
+                    >
+                      Eliminar equipo
+                    </button>
+                    <button
+                      type="button"
                       class="botón boton-secundario"
                       [disabled]="guardandoEquipo()"
                       (click)="cancelarEdicionEquipo()"
@@ -365,14 +375,6 @@ type Confirmacion = {
                               (click)="editarSala(aula)"
                             >
                               Editar
-                            </button>
-                            <button
-                              type="button"
-                              class="botón boton-fila border border-pop-400/40 bg-pop-500/15 text-[#f9a8d4] hover:bg-pop-500/25"
-                              [disabled]="operando()"
-                              (click)="eliminarSala(aula)"
-                            >
-                              Eliminar
                             </button>
                           }
                         </div>
@@ -495,14 +497,6 @@ type Confirmacion = {
                             >
                               Editar
                             </button>
-                            <button
-                              type="button"
-                              class="botón boton-fila border border-pop-400/40 bg-pop-500/15 text-[#f9a8d4] hover:bg-pop-500/25"
-                              [disabled]="operando()"
-                              (click)="eliminarEquipo(item)"
-                            >
-                              Eliminar
-                            </button>
                           }
                         </div>
                       </td>
@@ -579,7 +573,6 @@ export class SalasEquipos implements OnInit {
   protected readonly cambiandoEstado = signal(false);
   protected readonly operando = signal(false);
   protected readonly aviso = signal<Aviso | null>(null);
-  protected readonly confirmacion = signal<Confirmacion | null>(null);
 
   protected sala = { nombre: '', capacidadMaxima: 12 };
 
@@ -737,32 +730,17 @@ export class SalasEquipos implements OnInit {
       });
       return;
     }
-    this.confirmacion.set({
-      tipo: 'sala',
-      id: aula.id,
-      nombre: aula.nombre,
-      mensaje: `¿Quieres eliminar esta aula "${aula.nombre}"?`,
-      accion: () => {
-        this.ejecutarEliminarSala(aula.id, aula.nombre);
-      },
-    });
-  }
-
-  private ejecutarEliminarSala(id: number, nombre: string): void {
-    this.operando.set(true);
-    this.inventario.eliminarSala(id).subscribe({
+    this.inventario.eliminarSala(aula.id).subscribe({
       next: () => {
-        this.operando.set(false);
-        this.confirmacion.set(null);
-        this.aviso.set({ tipo: 'exito', texto: `Aula "${nombre}" eliminada.` });
+        this.aviso.set({ tipo: 'exito', texto: `Aula "${aula.nombre}" eliminada.` });
       },
       error: (error: unknown) => {
-        this.operando.set(false);
-        this.confirmacion.set(null);
         this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
       },
     });
   }
+
+
 
   protected cancelarEdicionSala(): void {
     this.editandoSala.set(null);
@@ -785,32 +763,17 @@ export class SalasEquipos implements OnInit {
 
   protected eliminarEquipo(item: Equipo): void {
     this.aviso.set(null);
-    this.confirmacion.set({
-      tipo: 'equipo',
-      id: item.id,
-      nombre: item.codigo,
-      mensaje: `¿Quieres eliminar este equipo "${item.codigo}"?`,
-      accion: () => {
-        this.ejecutarEliminarEquipo(item.id, item.codigo);
-      },
-    });
-  }
-
-  private ejecutarEliminarEquipo(id: number, codigo: string): void {
-    this.operando.set(true);
-    this.inventario.eliminarEquipo(id).subscribe({
+    this.inventario.eliminarEquipo(item.id).subscribe({
       next: () => {
-        this.operando.set(false);
-        this.confirmacion.set(null);
-        this.aviso.set({ tipo: 'exito', texto: `Equipo "${codigo}" eliminado.` });
+        this.aviso.set({ tipo: 'exito', texto: `Equipo "${item.codigo}" eliminado.` });
       },
       error: (error: unknown) => {
-        this.operando.set(false);
-        this.confirmacion.set(null);
         this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
       },
     });
   }
+
+
 
   protected cancelarEdicionEquipo(): void {
     this.editandoEquipo.set(null);
