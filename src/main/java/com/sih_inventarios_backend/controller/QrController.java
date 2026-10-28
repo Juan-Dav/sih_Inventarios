@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/equipos")
+@RequestMapping("/api/equipos/{id}")
 public class QrController {
 
     private final QrService qrService;
@@ -23,7 +23,7 @@ public class QrController {
         this.equipoRepository = equipoRepository;
     }
 
-    @PostMapping("/{id}/generar-qr")
+    @PostMapping("/generar-qr")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'TECNICO')")
     public ResponseEntity<?> generar(@PathVariable Long id) {
         try {
@@ -34,7 +34,7 @@ public class QrController {
         }
     }
 
-    @GetMapping("/{id}/qr/imagen")
+    @GetMapping("/qr/imagen")
     public ResponseEntity<byte[]> imagen(@PathVariable Long id, @RequestParam(defaultValue = "256") int size) {
         try {
             Equipo equipo = equipoRepository.findById(id).orElseThrow(() -> new RuntimeException("El equipo no existe"));

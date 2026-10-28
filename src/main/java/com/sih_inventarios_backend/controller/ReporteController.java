@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @RestController
-@RequestMapping("/api/reportes")
+@RequestMapping("/api/reportes/inventario")
 public class ReporteController {
 
     private final ReporteService reporteService;
@@ -22,7 +22,7 @@ public class ReporteController {
         this.reporteService = reporteService;
     }
 
-    @GetMapping("/inventario/pdf")
+    @GetMapping("/pdf")
     public ResponseEntity<byte[]> inventarioPdf() {
         try {
             byte[] pdf = reporteService.generarInventarioPdf();
@@ -37,7 +37,7 @@ public class ReporteController {
         }
     }
 
-    @GetMapping("/inventario/excel")
+    @GetMapping("/excel")
     public ResponseEntity<byte[]> inventarioExcel() {
         try {
             byte[] excel = reporteService.generarInventarioExcel();
@@ -52,7 +52,7 @@ public class ReporteController {
         }
     }
 
-    @GetMapping("/inventario/historial/{idEquipo}/pdf")
+    @GetMapping("/historial/{idEquipo}/pdf")
     public ResponseEntity<byte[]> historialEquipoPdf(@PathVariable Long idEquipo) {
         try {
             byte[] pdf = reporteService.generarHistorialEquipoPdf(idEquipo);
@@ -67,7 +67,7 @@ public class ReporteController {
         }
     }
 
-    @GetMapping("/inventario/historial/{idEquipo}/excel")
+    @GetMapping("/historial/{idEquipo}/excel")
     public ResponseEntity<byte[]> historialEquipoExcel(@PathVariable Long idEquipo) {
         try {
             byte[] excel = reporteService.generarHistorialEquipoExcel(idEquipo);
