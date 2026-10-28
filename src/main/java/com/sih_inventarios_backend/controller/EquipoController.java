@@ -124,6 +124,16 @@ public class EquipoController {
         }
     }
 
+    @GetMapping("/{id}/detalle")
+    public ResponseEntity<?> obtenerDetalle(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(equipoService.obtenerPorId(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+
     // Elimina un equipo. Solo técnicos y administradores.
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'TECNICO')")

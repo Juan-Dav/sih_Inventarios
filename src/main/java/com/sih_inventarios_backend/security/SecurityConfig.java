@@ -57,11 +57,9 @@ public class SecurityConfig {
                         // El plan se puede leer desde cualquier panel (los tres
                         // roles necesitan ver los límites).
                         .requestMatchers(HttpMethod.GET, "/api/plan").authenticated()
-                        // Comprar y cancelar el Premium lo puede cualquiera con
-                        // sesión: el plan es de la institución, no de un usuario,
-                        // así que basta con estar dentro del sistema. El cobro
-                        // sigue siendo simulado, no hay pasarela detrás.
-                        .requestMatchers(HttpMethod.POST, "/api/plan/comprar", "/api/plan/cancelar").authenticated()
+                        // Comprar, activar, renovar y cancelar el Premium SOLO lo puede el ADMINISTRADOR.
+                        // El cobro es simulado, no hay pasarela detrás.
+                        .requestMatchers(HttpMethod.POST, "/api/plan/comprar", "/api/plan/activar", "/api/plan/renovar", "/api/plan/cancelar").hasRole("ADMINISTRADOR")
                         // El perfil propio lo necesita cualquiera con sesión.
                         .requestMatchers(HttpMethod.GET, "/api/usuarios/me").authenticated()
                         // La gestión de cuentas es exclusiva del administrador.

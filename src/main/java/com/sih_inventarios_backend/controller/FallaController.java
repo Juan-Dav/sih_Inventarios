@@ -73,4 +73,14 @@ public class FallaController {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
+
+    @PostMapping("/verificar-duplicados")
+    public ResponseEntity<?> verificarDuplicados(@RequestParam Long idEquipo) {
+        try {
+            return ResponseEntity.ok(fallaService.verificarDuplicados(idEquipo));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
 }

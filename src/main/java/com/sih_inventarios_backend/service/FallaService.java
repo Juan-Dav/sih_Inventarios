@@ -77,9 +77,6 @@ public class FallaService {
 
     /**
      * Cambia el estado de una falla.
-     *
-     * Sin esto una falla se quedaria en PENDIENTE para siempre aunque el técnico
-     * ya la atendiera, porque el backend solo tenia alta y listado.
      */
     @Transactional
     public Falla actualizarEstado(Long id, String estado) {
@@ -87,8 +84,20 @@ public class FallaService {
                 .orElseThrow(() -> new RuntimeException("Error: La falla no existe."));
 
         falla.setEstado(validarEstado(estado));
+        if ("RESUELTO".equals(falla.getEstado()) && falla.getFechaResolucion() == null) {
+            falla.setFechaResolucion(java.time.LocalDateTime.now());
+        }
         return fallaRepository.save(falla);
     }
+
+    @Transactional(readOnly = true)
+    public List<Falla> verificarDuplicados(Long idEquipo) {
+        return fallaRepository.findAll().stream()
+                .filter(f -> f.getEquipo() != null && idEquipo.equals(f.getEquipo().getId()))
+                .filter(f -> f.getEstado() != null && !"RESUELTO".equals(f.getEstado()))
+                .toList();
+    }
+
 
     /** Normaliza y valida el estado de una falla. */
     private String validarEstado(String estado) {

@@ -142,56 +142,62 @@ public class PlanService {
     }
 
     /**
-     * Activa el plan Premium con compra simulada.
-     *
-     * Si ya está pagado, no hace nada y devuelve el plan actual.
+     * Activa/renueva el plan Premium con compra simulada (sin pasarela real).
      */
     @Transactional
     public Plan activarPremium() {
         Plan plan = obtenerPlanActivo();
 
-        if (Plan.PAGO_PAGADO.equals(plan.getEstadoPago()) && Plan.PREMIUM.equals(plan.getNombre())) {
-            return plan;
+        LocalDateTime now = LocalDateTime.now();
+        if (plan.getFechaInicio() == null) {
+            plan.setFechaInicio(now);
         }
+        plan.setFechaVencimiento(now.plusDays(30));
 
         plan.setNombre(Plan.PREMIUM);
         plan.setPrecio(precioPremium);
+        plan.setMoneda("COP");
+        plan.setPeriodicidad("MENSUAL");
         plan.setMaxSalas(null);
         plan.setMaxEquiposPorSala(null);
         plan.setEstadoPago(Plan.PAGO_PAGADO);
-        plan.setReferenciaPago("SIM-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase());
-        plan.setFechaActivacion(LocalDateTime.now());
+        plan.setRenovacionAutomatica(false);
+        if (plan.getReferenciaPago() == null || plan.getReferenciaPago().isBlank()) {
+            plan.setReferenciaPago("SIM-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase());
+        }
+        if (plan.getFechaActivacion() == null) {
+            plan.setFechaActivacion(now);
+        }
         return planRepository.save(plan);
     }
 
     /**
      * Cancela el Premium y vuelve al plan gratuito.
-     *
-     * Cancelar no borra nada: el inventario que ya se registró se queda como
-     * está, solo vuelven los topes. Por eso no se bloquea aunque ya haya más
-     * aulas de las que el gratuito permite: el sistema sigue mostrando todo y
-     * simplemente no deja registrar más hasta volver a contratar.
-     *
-     * Si ya está en gratuito, no hace nada y devuelve el plan actual, para que
-     * pulsar dos veces el botón no rompa nada.
+     * No elimina equipos, salas, usuarios ni históricos.
      */
     @Transactional
     public Plan cancelarPremium() {
         Plan plan = obtenerPlanActivo();
 
         if (Plan.GRATUITO.equals(plan.getNombre())) {
-            return plan;
+            plan.setMoneda("COP");
+            plan.setPeriodicidad("MENSUAL");
+            plan.setRenovacionAutomatica(false);
+            return planRepository.save(plan);
         }
 
         plan.setNombre(Plan.GRATUITO);
         plan.setPrecio(0L);
+        plan.setMoneda("COP");
+        plan.setPeriodicidad("MENSUAL");
         plan.setMaxSalas(maxSalasGratuito);
         plan.setMaxEquiposPorSala(maxEquiposGratuito);
         plan.setEstadoPago(Plan.PAGO_CANCELADO);
-        plan.setReferenciaPago(null);
-        plan.setFechaActivacion(null);
+        plan.setRenovacionAutomatica(false);
+        // Mantener histórico de fechas; no borrar inventario
         return planRepository.save(plan);
     }
+
 
     /**
      * Precio del Premium tal y como se muestra en pantalla. n

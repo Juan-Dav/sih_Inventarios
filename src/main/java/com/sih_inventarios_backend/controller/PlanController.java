@@ -29,30 +29,54 @@ public class PlanController {
         return planService.obtenerEstado();
     }
 
-    /** Compra simulada del plan Premium. */
+    /** Compra simulada del plan Premium. Solo ADMINISTRADOR. */
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping("/comprar")
     public ResponseEntity<?> comprarPremium() {
         try {
             planService.activarPremium();
             return ResponseEntity.ok(planService.obtenerEstado());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
+        }
+    }
+
+    /** Activar/renovar premium (simulado). Solo ADMINISTRADOR. */
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PostMapping("/activar")
+    public ResponseEntity<?> activarPremium() {
+        try {
+            planService.activarPremium();
+            return ResponseEntity.ok(planService.obtenerEstado());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
+        }
+    }
+
+    /** Renovar premium (simulado). Solo ADMINISTRADOR. */
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PostMapping("/renovar")
+    public ResponseEntity<?> renovarPremium() {
+        try {
+            planService.activarPremium();
+            return ResponseEntity.ok(planService.obtenerEstado());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
         }
     }
 
     /**
-     * Cancela el Premium y vuelve al gratuito.
-     *
-     * Los errores salen como 400 y no como 500 por la misma razón que en la
-     * compra: son rechazos previstos, no fallos del servidor.
+     * Cancela el Premium y vuelve al gratuito. Solo ADMINISTRADOR.
      */
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping("/cancelar")
     public ResponseEntity<?> cancelarPremium() {
         try {
             planService.cancelarPremium();
             return ResponseEntity.ok(planService.obtenerEstado());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
         }
     }
+
 }

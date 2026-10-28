@@ -139,9 +139,16 @@ public class EquipoService {
         return equipoRepository.save(equipo);
     }
 
+    @Transactional(readOnly = true)
+    public Equipo obtenerPorId(Long id) {
+        return equipoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Error: El equipo no existe."));
+    }
+
     public List<Equipo> obtenerTodos() {
         return equipoRepository.findAll();
     }
+
 
     /** Equipos de una sala, para el conteo por aula y la verificación física. */
     @Transactional(readOnly = true)
