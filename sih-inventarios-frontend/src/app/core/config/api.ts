@@ -1,15 +1,22 @@
 /**
  * Base del backend.
  *
- * Apunta al servicio desplegado en Render. Todo lo demás (API_USUARIOS,
- * API_SALAS, ...) se deriva de aquí, así que este es el único sitio donde hay
- * que cambiar la dirección para mover el backend.
+ * En producción apunta al servicio desplegado en Render. Todo lo demás
+ * (API_USUARIOS, API_SALAS, ...) se deriva de aquí, así que este es el único
+ * sitio donde hay que cambiar la dirección para mover el backend.
  *
- * Sigue siendo una constante, pero ahora el valor por defecto es el que sirve
- * en producción. Para trabajar contra un backend local en el 8080, cambia esta
- * línea a 'http://localhost:8080/api' y recarga.
+ * Al trabajar en local (`ng serve` en localhost) se usa el backend del 8080:
+ * así se puede probar un cambio del backend sin desplegarlo primero. La
+ * detección es por el host del navegador, no por una constante que haya que
+ * cambiar a mano y luego olvidar revertir.
  */
-export const API_BASE = 'https://sih-inventarios.onrender.com/api';
+const HOSTS_LOCALES = ['localhost', '127.0.0.1', '[::1]'];
+
+const esLocal = typeof window !== 'undefined' && HOSTS_LOCALES.includes(window.location.hostname);
+
+export const API_BASE = esLocal
+  ? 'http://localhost:8080/api'
+  : 'https://sih-inventarios.onrender.com/api';
 
 export const API_USUARIOS = `${API_BASE}/usuarios`;
 export const API_SALAS = `${API_BASE}/salas`;

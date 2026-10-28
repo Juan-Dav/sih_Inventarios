@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 
 import {
   Equipo,
@@ -50,6 +57,10 @@ import { Kpi } from '../../../core/ui/kpi/kpi';
         @if (error(); as mensaje) {
           <p class="aviso mt-4 bg-pop-500/15 txt-alerta">{{ mensaje }}</p>
         }
+
+        @if (exito(); as mensaje) {
+          <p class="aviso mt-4 bg-mint-400/15 txt-ok">{{ mensaje }}</p>
+        }
       </section>
 
       @if (resumen(); as datos) {
@@ -58,7 +69,9 @@ import { Kpi } from '../../../core/ui/kpi/kpi';
           <app-kpi
             etiqueta="Aulas registradas"
             [valor]="datos.totalSalas"
-            [detalle]="datos.totalSalas === 1 ? 'El plan gratuito permite una' : 'Sin límite en Premium'"
+            [detalle]="
+              datos.totalSalas === 1 ? 'El plan gratuito permite una' : 'Sin límite en Premium'
+            "
             icono="aula"
             gradiente="bg-gradient-to-r from-brand-500 to-brand-600"
             iconoClases="bg-brand-500/15 text-brand-300"
@@ -103,12 +116,26 @@ import { Kpi } from '../../../core/ui/kpi/kpi';
             <div class="mt-5 flex flex-col gap-4">
               @for (sala of datos.salas; track sala.salaId) {
                 <div class="rounded-2xl border border-ink-200 bg-white/5 overflow-hidden">
-                  <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-brand-600/20 to-aqua-500/10">
+                  <div
+                    class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-brand-600/20 to-aqua-500/10"
+                  >
                     <div>
                       <h3 class="text-lg font-bold text-ink-900">{{ sala.sala }}</h3>
-                      <p class="text-xs text-ink-600">Equipos registrados: {{ sala.equiposRegistrados }} / Capacidad: {{ sala.capacidadMaxima }}</p>
+                      <p class="text-xs text-ink-600">
+                        Equipos registrados: {{ sala.equiposRegistrados }} / Capacidad:
+                        {{ sala.capacidadMaxima }}
+                      </p>
                     </div>
-                    <select class="campo max-w-xs" (change)="descargarHistorialSala(sala.salaId, $any($event.target).value)">
+                    <select
+                      class="campo max-w-xs"
+                      (change)="
+                        descargarHistorialSala(
+                          sala.salaId,
+                          $any($event.target).value,
+                          $any($event.target)
+                        )
+                      "
+                    >
                       <option value="" disabled selected>Descargar historial de la sala</option>
                       <option value="pdf">PDF</option>
                       <option value="excel">Excel</option>
@@ -116,31 +143,50 @@ import { Kpi } from '../../../core/ui/kpi/kpi';
                   </div>
                   <div class="px-5 py-4">
                     <div class="flex flex-wrap gap-2 text-xs text-ink-600 mb-3">
-                      <span class="px-2 py-1 rounded-full bg-mint-400/15 txt-ok">Operativos: {{ sala.equiposOperativos }}</span>
-                      <span class="px-2 py-1 rounded-full bg-sun-400/15 txt-espera">En mantenimiento: {{ sala.equiposEnMantenimiento }}</span>
-                      <span class="px-2 py-1 rounded-full bg-pop-500/15 txt-alerta">Fuera de servicio: {{ sala.equiposFueraDeServicio }}</span>
+                      <span class="px-2 py-1 rounded-full bg-mint-400/15 txt-ok"
+                        >Operativos: {{ sala.equiposOperativos }}</span
+                      >
+                      <span class="px-2 py-1 rounded-full bg-sun-400/15 txt-espera"
+                        >En mantenimiento: {{ sala.equiposEnMantenimiento }}</span
+                      >
+                      <span class="px-2 py-1 rounded-full bg-pop-500/15 txt-alerta"
+                        >Fuera de servicio: {{ sala.equiposFueraDeServicio }}</span
+                      >
                       @if (sala.ultimaVerificacion) {
-                        <span class="px-2 py-1 rounded-full bg-ink-100">Último conteo: {{ fecha(sala.ultimaVerificacion) }}</span>
+                        <span class="px-2 py-1 rounded-full bg-ink-100"
+                          >Último conteo: {{ fecha(sala.ultimaVerificacion) }}</span
+                        >
                       } @else {
                         <span class="px-2 py-1 rounded-full bg-ink-100">Sin recorrer</span>
                       }
                       @if (sala.equiposFaltantes === null) {
                         <span class="px-2 py-1 rounded-full bg-ink-100">Faltantes: —</span>
                       } @else if (sala.equiposFaltantes > 0) {
-                        <span class="px-2 py-1 rounded-full bg-pop-500/15 txt-alerta">Faltantes: {{ sala.equiposFaltantes }}</span>
+                        <span class="px-2 py-1 rounded-full bg-pop-500/15 txt-alerta"
+                          >Faltantes: {{ sala.equiposFaltantes }}</span
+                        >
                       } @else {
-                        <span class="px-2 py-1 rounded-full bg-mint-400/15 txt-ok">Faltantes: 0</span>
+                        <span class="px-2 py-1 rounded-full bg-mint-400/15 txt-ok"
+                          >Faltantes: 0</span
+                        >
                       }
                     </div>
                     <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                       @for (equipo of equiposDeSala(sala.salaId); track equipo.id) {
-                        <div class="flex items-center justify-between rounded-xl border border-ink-200 px-3 py-2">
+                        <div
+                          class="flex items-center justify-between rounded-xl border border-ink-200 px-3 py-2"
+                        >
                           <div>
                             <p class="font-bold text-ink-900">{{ equipo.codigo }}</p>
                             <p class="text-xs text-ink-600">{{ nombreEquipo(equipo) }}</p>
-                            <p class="text-xs text-ink-500">{{ equipo.caracteristicas || 'Sin características' }}</p>
+                            <p class="text-xs text-ink-500">
+                              {{ equipo.caracteristicas || 'Sin características' }}
+                            </p>
                           </div>
-                          <span class="etiqueta-estado" [class]="estiloEquipo(equipo.estado).clases">
+                          <span
+                            class="etiqueta-estado"
+                            [class]="estiloEquipo(equipo.estado).clases"
+                          >
                             {{ estiloEquipo(equipo.estado).texto }}
                           </span>
                         </div>
@@ -217,6 +263,8 @@ export class InventarioGeneral implements OnInit {
   protected readonly resumen = signal<ResumenInventario | null>(null);
   protected readonly cargando = signal(false);
   protected readonly error = signal<string | null>(null);
+  /** Confirmación de una descarga: verde, para no confundirla con un error. */
+  protected readonly exito = signal<string | null>(null);
 
   protected readonly fecha = formatearFecha;
   protected readonly nombreEquipo = nombreEquipo;
@@ -248,42 +296,63 @@ export class InventarioGeneral implements OnInit {
     return this.inventario.equipos().filter((equipo) => equipo.sala?.id === salaId);
   }
 
-  protected descargarHistorialSala(salaId: number, tipo: string): void {
+  /**
+   * Descarga el historial del aula completa en un solo archivo.
+   *
+   * Antes se pedía un reporte por cada equipo y el navegador bajaba una lluvia
+   * de archivos (y si uno fallaba, el aviso tapaba a los demás). Ahora el
+   * backend arma un único PDF o Excel con el aula y todos sus equipos.
+   */
+  protected descargarHistorialSala(
+    salaId: number,
+    tipo: string,
+    selector?: HTMLSelectElement,
+  ): void {
     if (tipo !== 'pdf' && tipo !== 'excel') {
       return;
     }
-    const equipos = this.equiposDeSala(salaId);
-    if (equipos.length === 0) {
-      this.error.set('No hay equipos en esta sala para generar el historial.');
-      return;
-    }
+
     this.error.set(null);
-    const peticiones = equipos.map((e) =>
-      tipo === 'pdf' ? this.inventario.descargarHistorialEquipoPdf(e.id) : this.inventario.descargarHistorialEquipoExcel(e.id),
-    );
-    let completados = 0;
-    peticiones.forEach((p, idx) => {
-      p.subscribe({
-        next: (blob) => {
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          const fecha = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-          a.download = tipo === 'pdf' ? `historial_sala_${salaId}_equipo_${equipos[idx].codigo}_${fecha}.pdf` : `historial_sala_${salaId}_equipo_${equipos[idx].codigo}_${fecha}.xlsx`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-          completados++;
-          if (completados === peticiones.length) {
-            this.error.set(null);
-          }
-        },
-        error: (err: unknown) => {
-          this.error.set(this.inventario.leerError(err));
-        },
-      });
+    this.exito.set(null);
+
+    const sala = this.resumen()?.salas.find((item) => item.salaId === salaId);
+    const solicitud =
+      tipo === 'pdf'
+        ? this.inventario.descargarHistorialSalaPdf(salaId)
+        : this.inventario.descargarHistorialSalaExcel(salaId);
+
+    solicitud.subscribe({
+      next: (blob) => {
+        const nombre = (sala?.sala ?? `aula_${salaId}`)
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-zA-Z0-9]+/g, '_')
+          .replace(/^_+|_+$/g, '');
+        const fecha = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        const extension = tipo === 'pdf' ? 'pdf' : 'xlsx';
+        this.guardarBlob(blob, `historial_${nombre}_${fecha}.${extension}`);
+        this.exito.set(`Historial del aula descargado en ${tipo === 'pdf' ? 'PDF' : 'Excel'}.`);
+      },
+      error: (err: unknown) => {
+        this.error.set(this.inventario.leerError(err));
+      },
     });
+
+    // El desplegable vuelve a su texto inicial para poder repetir la descarga.
+    if (selector) {
+      selector.value = '';
+    }
+  }
+
+  private guardarBlob(blob: Blob, nombreArchivo: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = nombreArchivo;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+    window.URL.revokeObjectURL(url);
   }
 
   ngOnInit(): void {

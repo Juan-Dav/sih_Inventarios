@@ -2,7 +2,15 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, forkJoin, tap } from 'rxjs';
 
-import { API_EQUIPOS, API_FALLAS, API_INVENTARIO, API_MANTENIMIENTOS, API_REPORTES, API_SALAS, API_VERIFICACIONES } from '../config/api';
+import {
+  API_EQUIPOS,
+  API_FALLAS,
+  API_INVENTARIO,
+  API_MANTENIMIENTOS,
+  API_REPORTES,
+  API_SALAS,
+  API_VERIFICACIONES,
+} from '../config/api';
 import {
   EditarEquipo,
   EditarSala,
@@ -84,9 +92,7 @@ export class InventarioService {
   }
 
   listarEquipos(): Observable<Equipo[]> {
-    return this.http
-      .get<Equipo[]>(API_EQUIPOS)
-      .pipe(tap((equipos) => this._equipos.set(equipos)));
+    return this.http.get<Equipo[]>(API_EQUIPOS).pipe(tap((equipos) => this._equipos.set(equipos)));
   }
 
   listarFallas(): Observable<Falla[]> {
@@ -190,24 +196,47 @@ export class InventarioService {
   /* ----------------------------- Reportes ----------------------------- */
 
   descargarHistorialEquipoPdf(idEquipo: number): Observable<Blob> {
-    return this.http.get(`${API_REPORTES}/inventario/historial/${idEquipo}/pdf`, { responseType: 'blob' });
+    return this.http.get(`${API_REPORTES}/inventario/historial/${idEquipo}/pdf`, {
+      responseType: 'blob',
+    });
   }
 
   descargarHistorialEquipoExcel(idEquipo: number): Observable<Blob> {
-    return this.http.get(`${API_REPORTES}/inventario/historial/${idEquipo}/excel`, { responseType: 'blob' });
+    return this.http.get(`${API_REPORTES}/inventario/historial/${idEquipo}/excel`, {
+      responseType: 'blob',
+    });
+  }
+
+  /**
+   * Historial completo de un aula en un solo archivo.
+   *
+   * Incluye los datos de cada equipo y, debajo, sus fallas y sus
+   * mantenimientos. Antes el navegador pedía un reporte por equipo y bajaba un
+   * archivo por cada uno; ahora es una sola descarga.
+   */
+  descargarHistorialSalaPdf(idSala: number): Observable<Blob> {
+    return this.http.get(`${API_REPORTES}/inventario/sala/${idSala}/pdf`, { responseType: 'blob' });
+  }
+
+  descargarHistorialSalaExcel(idSala: number): Observable<Blob> {
+    return this.http.get(`${API_REPORTES}/inventario/sala/${idSala}/excel`, {
+      responseType: 'blob',
+    });
   }
 
   /* ------------------------------- Altas ------------------------------- */
 
   /** Cambia el nombre o la capacidad de un aula. */
   actualizarSala(id: number, cambios: EditarSala): Observable<Sala> {
-    return this.http.put<Sala>(`${API_SALAS}/${id}`, cambios).pipe(
-      tap((actualizada) =>
-        this._salas.update((lista) =>
-          lista.map((sala) => (sala.id === actualizada.id ? actualizada : sala)),
+    return this.http
+      .put<Sala>(`${API_SALAS}/${id}`, cambios)
+      .pipe(
+        tap((actualizada) =>
+          this._salas.update((lista) =>
+            lista.map((sala) => (sala.id === actualizada.id ? actualizada : sala)),
+          ),
         ),
-      ),
-    );
+      );
   }
 
   /**
@@ -219,13 +248,15 @@ export class InventarioService {
   actualizarEquipo(id: number, cambios: EditarEquipo, idSala?: number | null): Observable<Equipo> {
     const params = idSala ? new HttpParams().set('idSala', idSala) : undefined;
 
-    return this.http.put<Equipo>(`${API_EQUIPOS}/${id}`, cambios, { params }).pipe(
-      tap((actualizado) =>
-        this._equipos.update((lista) =>
-          lista.map((equipo) => (equipo.id === actualizado.id ? actualizado : equipo)),
+    return this.http
+      .put<Equipo>(`${API_EQUIPOS}/${id}`, cambios, { params })
+      .pipe(
+        tap((actualizado) =>
+          this._equipos.update((lista) =>
+            lista.map((equipo) => (equipo.id === actualizado.id ? actualizado : equipo)),
+          ),
         ),
-      ),
-    );
+      );
   }
 
   /**
@@ -261,23 +292,23 @@ export class InventarioService {
   }
 
   crearSala(datos: NuevaSala): Observable<Sala> {
-    return this.http.post<Sala>(API_SALAS, datos).pipe(
-      tap((sala) => this._salas.update((lista) => [...lista, sala])),
-    );
+    return this.http
+      .post<Sala>(API_SALAS, datos)
+      .pipe(tap((sala) => this._salas.update((lista) => [...lista, sala])));
   }
 
   crearEquipo(datos: NuevoEquipo, idSala: number): Observable<Equipo> {
     const params = new HttpParams().set('idSala', idSala);
-    return this.http.post<Equipo>(API_EQUIPOS, datos, { params }).pipe(
-      tap((equipo) => this._equipos.update((lista) => [...lista, equipo])),
-    );
+    return this.http
+      .post<Equipo>(API_EQUIPOS, datos, { params })
+      .pipe(tap((equipo) => this._equipos.update((lista) => [...lista, equipo])));
   }
 
   reportarFalla(datos: NuevaFalla, idEquipo: number): Observable<Falla> {
     const params = new HttpParams().set('idEquipo', idEquipo);
-    return this.http.post<Falla>(API_FALLAS, datos, { params }).pipe(
-      tap((falla) => this._fallas.update((lista) => [falla, ...lista])),
-    );
+    return this.http
+      .post<Falla>(API_FALLAS, datos, { params })
+      .pipe(tap((falla) => this._fallas.update((lista) => [falla, ...lista])));
   }
 
   registrarMantenimiento(
@@ -286,23 +317,25 @@ export class InventarioService {
     idFalla: number,
   ): Observable<Mantenimiento> {
     const params = new HttpParams().set('idEquipo', idEquipo).set('idFalla', idFalla);
-    return this.http.post<Mantenimiento>(API_MANTENIMIENTOS, datos, { params }).pipe(
-      tap((mantenimiento) => this._mantenimientos.update((lista) => [mantenimiento, ...lista])),
-    );
+    return this.http
+      .post<Mantenimiento>(API_MANTENIMIENTOS, datos, { params })
+      .pipe(
+        tap((mantenimiento) => this._mantenimientos.update((lista) => [mantenimiento, ...lista])),
+      );
   }
 
   /** Elimina un aula. */
   eliminarSala(id: number): Observable<any> {
-    return this.http.delete(`${API_SALAS}/${id}`).pipe(
-      tap(() => this._salas.update((lista) => lista.filter((sala) => sala.id !== id))),
-    );
+    return this.http
+      .delete(`${API_SALAS}/${id}`)
+      .pipe(tap(() => this._salas.update((lista) => lista.filter((sala) => sala.id !== id))));
   }
 
   /** Elimina un equipo. */
   eliminarEquipo(id: number): Observable<any> {
-    return this.http.delete(`${API_EQUIPOS}/${id}`).pipe(
-      tap(() => this._equipos.update((lista) => lista.filter((equipo) => equipo.id !== id))),
-    );
+    return this.http
+      .delete(`${API_EQUIPOS}/${id}`)
+      .pipe(tap(() => this._equipos.update((lista) => lista.filter((equipo) => equipo.id !== id))));
   }
 
   /* --------------------------- Cambios de estado --------------------------- */
@@ -360,7 +393,8 @@ export class InventarioService {
         if (typeof mensaje === 'string') return mensaje;
       }
 
-      if (error.status === 0) return 'No hay conexión con el backend. Revisa tu internet o que el servicio esté en marcha.';
+      if (error.status === 0)
+        return 'No hay conexión con el backend. Revisa tu internet o que el servicio esté en marcha.';
       if (error.status === 401) return 'Tu sesión expiró. Vuelve a iniciar sesión.';
       if (error.status === 403) return 'Tu rol no tiene permiso para esta acción.';
       return `El backend respondió con el estado ${error.status}.`;

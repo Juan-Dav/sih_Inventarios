@@ -462,8 +462,8 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                       </td>
                       <td class="text-ink-600">{{ item.sala.nombre }}</td>
                       <td class="max-w-sm text-ink-600">{{ item.caracteristicas || '—' }}</td>
-                      <td>
-                        <div class="flex flex-wrap items-center gap-2">
+                      <td class="whitespace-nowrap">
+                        <div class="flex flex-nowrap items-center gap-2">
                           <span class="etiqueta-estado" [class]="estilo(item.estado).clases">
                             {{ estilo(item.estado).texto }}
                           </span>
@@ -477,39 +477,37 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                             solo confunde: la etiqueta al lado ya dice el
                             estado.
                             -->
-                          <div class="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            class="botón boton-secundario boton-fila"
+                            [disabled]="generandoQrId() === item.id"
+                            (click)="generarQr(item.id)"
+                          >
+                            {{ generandoQrId() === item.id ? 'Generando...' : 'Generar QR' }}
+                          </button>
+                          @if (permiteCambiarEstado()) {
+                            <select
+                              class="campo !w-auto !py-1 !text-xs"
+                              [disabled]="cambiandoEstado()"
+                              [value]="item.estado"
+                              (change)="cambiarEstadoDe(item.id, $event)"
+                              [attr.aria-label]="'Cambiar estado de ' + item.codigo"
+                            >
+                              @for (estado of estados; track estado) {
+                                <option [value]="estado">{{ estilo(estado).texto }}</option>
+                              }
+                            </select>
+                          }
+                          @if (permiteEditar()) {
                             <button
                               type="button"
                               class="botón boton-secundario boton-fila"
-                              [disabled]="generandoQrId() === item.id"
-                              (click)="generarQr(item.id)"
+                              [disabled]="operando()"
+                              (click)="editarEquipo(item)"
                             >
-                              {{ generandoQrId() === item.id ? 'Generando...' : 'Generar QR' }}
+                              Editar
                             </button>
-                            @if (permiteCambiarEstado()) {
-                              <select
-                                class="campo !w-auto !py-1 !text-xs"
-                                [disabled]="cambiandoEstado()"
-                                [value]="item.estado"
-                                (change)="cambiarEstadoDe(item.id, $event)"
-                                [attr.aria-label]="'Cambiar estado de ' + item.codigo"
-                              >
-                                @for (estado of estados; track estado) {
-                                  <option [value]="estado">{{ estilo(estado).texto }}</option>
-                                }
-                              </select>
-                            }
-                            @if (permiteEditar()) {
-                              <button
-                                type="button"
-                                class="botón boton-secundario boton-fila"
-                                [disabled]="operando()"
-                                (click)="editarEquipo(item)"
-                              >
-                                Editar
-                              </button>
-                            }
-                          </div>
+                          }
                         </div>
                       </td>
                     </tr>
@@ -850,43 +848,142 @@ export class SalasEquipos implements OnInit {
       },
     });
   }
+  /**
+   * Genera (si hace falta) el código QR del equipo y lo muestra en una pestaña.
+   *
+   * La imagen se pide con HttpClient para que el interceptor añada el token: un
+   * `<img src="...">` directo no envía la cabecera Authorization y el backend
+   * respondía con un error. Una vez descargada como blob, la pestaña la muestra
+   * y el enlace "Descargar PNG" funciona sin volver a pedirla.
+   *
+   * La pestaña se abre antes de la petición porque los navegadores bloquean las
+   * ventanas que se abren después de una respuesta asíncrona.
+   */
   protected generarQr(id: number): void {
     this.generandoQrId.set(id);
     this.aviso.set(null);
-    const equipo = this.inventario.equipos().find((e) => e.id === id);
+
+    const equipo = this.inventario.equipos().find((item) => item.id === id);
+    const codigo = equipo?.codigo || String(id);
+    const sala = equipo?.sala?.nombre || '';
+
+    // La pestaña se abre ya con una página propia (blob) y no con about:blank:
+    // escribir sobre about:blank antes de que cargue deja la ventana en blanco
+    // en algunos navegadores. Abrirla en el clic evita el bloqueo de emergentes.
+    const ventana = this.abrirPaginaQr(this.htmlQr(codigo, sala, null));
+
     this.http.post(`${API_BASE}/equipos/${id}/generar-qr`, {}).subscribe({
       next: () => {
-        this.generandoQrId.set(null);
-        const codigo = equipo?.codigo || String(id);
-        const sala = equipo?.sala?.nombre || '';
-        const imgUrl = `${API_BASE}/equipos/${id}/qr/imagen?size=256`;
-        const html =
-          '<!DOCTYPE html><html><head><meta charset="utf-8"><title>QR ' +
-          codigo +
-          '</title><style>body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#0f1026,#1e1b4b);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0}.card{background:linear-gradient(135deg,rgba(124,58,237,.9),rgba(37,99,235,.9));padding:32px;border-radius:20px;text-align:center;box-shadow:0 30px 80px rgba(37,99,235,.5);border:1px solid rgba(255,255,255,.2)}h2{margin:0;font-size:24px}p{margin:6px 0 20px;color:rgba(255,255,255,.8)}img{background:#fff;padding:14px;border-radius:16px}.actions{margin-top:20px;display:flex;gap:12px;justify-content:center}a{color:#0f1026;text-decoration:none;background:#22c55e;padding:10px 18px;border-radius:999px;font-weight:700}</style></head><body><div class="card"><h2>' +
-          codigo +
-          '</h2><p>' +
-          sala +
-          '</p><img src="' +
-          imgUrl +
-          '" width="256" height="256" alt="QR ' +
-          codigo +
-          '"><div class="actions"><a download="QR_' +
-          codigo +
-          '.png" href="' +
-          imgUrl +
-          '">Descargar PNG</a></div></div></body></html>';
-        const win = window.open('', '_blank', 'width=460,height=560');
-        if (win) {
-          win.document.write(html);
-          win.document.close();
-        }
-        this.aviso.set({ tipo: 'exito', texto: 'Código QR generado correctamente.' });
+        this.http
+          .get(`${API_BASE}/equipos/${id}/qr/imagen`, {
+            params: { size: 256 },
+            responseType: 'blob',
+          })
+          .subscribe({
+            next: (imagen) => {
+              this.generandoQrId.set(null);
+
+              // La imagen viaja dentro del HTML como data URL: la pestaña es un
+              // documento blob y ahí las URLs blob del abridor no siempre se
+              // resuelven. Así el QR y el enlace de descarga son autocontenidos.
+              this.leerComoDataUrl(imagen)
+                .then((dataUrl) => {
+                  if (ventana && !ventana.closed) {
+                    const pagina = window.URL.createObjectURL(
+                      new Blob([this.htmlQr(codigo, sala, dataUrl)], { type: 'text/html' }),
+                    );
+                    ventana.location.replace(pagina);
+                    // La URL de la página se libera cuando se cierra la pestaña.
+                    ventana.addEventListener('unload', () => window.URL.revokeObjectURL(pagina));
+                  } else {
+                    // Si el navegador bloqueó la pestaña, al menos se descarga.
+                    this.descargarImagenQr(dataUrl, codigo);
+                  }
+
+                  this.aviso.set({ tipo: 'exito', texto: 'Código QR generado correctamente.' });
+                })
+                .catch(() => {
+                  ventana?.close();
+                  this.aviso.set({ tipo: 'error', texto: 'No se pudo preparar la imagen del QR.' });
+                });
+            },
+            error: (error: unknown) => {
+              this.generandoQrId.set(null);
+              ventana?.close();
+              this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
+            },
+          });
       },
       error: (error: unknown) => {
         this.generandoQrId.set(null);
+        ventana?.close();
         this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
       },
     });
+  }
+
+  /** Abre una pestaña con el HTML indicado sin depender de about:blank. */
+  private abrirPaginaQr(html: string): Window | null {
+    const url = window.URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    const ventana = window.open(url, '_blank', 'width=480,height=620');
+    // Sin pestaña no hay dónde mostrar la página: se libera enseguida.
+    if (!ventana) {
+      window.URL.revokeObjectURL(url);
+    }
+    return ventana;
+  }
+
+  /** Convierte la imagen del QR en data URL para incrustarla en la página. */
+  private leerComoDataUrl(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const lector = new FileReader();
+      lector.onload = () => resolve(String(lector.result));
+      lector.onerror = () => reject(lector.error);
+      lector.readAsDataURL(blob);
+    });
+  }
+
+  private descargarImagenQr(dataUrl: string, codigo: string): void {
+    const enlace = document.createElement('a');
+    enlace.href = dataUrl;
+    enlace.download = `QR_${codigo}.png`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+  }
+
+  /** Página que se pinta en la pestaña del QR, con o sin la imagen ya lista. */
+  private htmlQr(codigo: string, sala: string, imagenUrl: string | null): string {
+    const contenido = imagenUrl
+      ? `<img src="${imagenUrl}" width="256" height="256" alt="QR ${codigo}" />
+         <div class="actions">
+           <a download="QR_${codigo}.png" href="${imagenUrl}">Descargar PNG</a>
+         </div>`
+      : '<p class="cargando">Generando el código QR…</p>';
+
+    return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>QR ${codigo}</title>
+<style>
+  body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #0f1026, #1e1b4b); color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+  .card { background: linear-gradient(135deg, rgba(124,58,237,.9), rgba(37,99,235,.9)); padding: 32px; border-radius: 20px; text-align: center; box-shadow: 0 30px 80px rgba(37,99,235,.5); border: 1px solid rgba(255,255,255,.2); }
+  h2 { margin: 0; font-size: 24px; }
+  p { margin: 6px 0 20px; color: rgba(255,255,255,.85); }
+  .cargando { margin: 40px 0; }
+  img { background: #fff; padding: 14px; border-radius: 16px; }
+  .actions { margin-top: 20px; display: flex; gap: 12px; justify-content: center; }
+  a { color: #0f1026; text-decoration: none; background: #22c55e; padding: 10px 18px; border-radius: 999px; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h2>${codigo}</h2>
+    <p>${sala}</p>
+    ${contenido}
+  </div>
+</body>
+</html>`;
   }
 }
