@@ -54,6 +54,11 @@ public class SecurityConfig {
                                 "/api/usuarios/roles"
                         ).permitAll()
                         .requestMatchers("/error").permitAll()
+                        // La imagen del QR se pinta con <img>, que no envía la
+                        // cabecera Authorization, y el código escaneado se
+                        // consulta desde el celular, que tampoco tiene sesión.
+                        // Por eso ambas rutas quedan abiertas.
+                        .requestMatchers(HttpMethod.GET, "/api/equipos/*/qr/imagen", "/api/consulta/qr/**").permitAll()
                         // El plan se puede leer desde cualquier panel (los tres
                         // roles necesitan ver los límites).
                         .requestMatchers(HttpMethod.GET, "/api/plan").authenticated()

@@ -101,4 +101,41 @@ public class ReporteController {
     public ResponseEntity<byte[]> historialEquipoExcelAlt2(@PathVariable Long idEquipo) {
         return historialEquipoExcel(idEquipo);
     }
+
+    /**
+     * Historial de un aula completa en un solo PDF: portada con el resumen y una
+     * página por equipo con sus fallas y sus mantenimientos.
+     */
+    @GetMapping("/sala/{idSala}/pdf")
+    public ResponseEntity<byte[]> historialSalaPdf(@PathVariable Long idSala) {
+        try {
+            byte[] pdf = reporteService.generarHistorialSalaPdf(idSala);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            String filename = "historial_aula_" + idSala + "_"
+                    + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".pdf";
+            headers.setContentDispositionFormData("attachment", filename);
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+            return ResponseEntity.ok().headers(headers).body(pdf);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/sala/{idSala}/excel")
+    public ResponseEntity<byte[]> historialSalaExcel(@PathVariable Long idSala) {
+        try {
+            byte[] excel = reporteService.generarHistorialSalaExcel(idSala);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            String filename = "historial_aula_" + idSala + "_"
+                    + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".xlsx";
+            headers.setContentDispositionFormData("attachment", filename);
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+            return ResponseEntity.ok().headers(headers).body(excel);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

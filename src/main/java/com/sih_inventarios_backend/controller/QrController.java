@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Map;
 
@@ -41,7 +42,14 @@ public class QrController {
             if (equipo.getCodigoQr() == null || equipo.getCodigoQr().isBlank()) {
                 equipo = qrService.generarQr(id);
             }
-            byte[] image = qrService.generarImagen(equipo.getCodigoQr(), size, size);
+            // El QR guarda la URL completa de consulta, no solo el identificador:
+            // al escanearlo con el celular el navegador abre la ficha del equipo.
+            int lado = Math.max(64, Math.min(size, 1024));
+            String url = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/api/consulta/qr/{codigo}")
+                    .buildAndExpand(equipo.getCodigoQr())
+                    .toUriString();
+            byte[] image = qrService.generarImagen(url, lado, lado);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
             headers.setCacheControl("no-cache, no-store, must-revalidate");
