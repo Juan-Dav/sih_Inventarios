@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, forkJoin, tap } from 'rxjs';
 
-import { API_EQUIPOS, API_FALLAS, API_INVENTARIO, API_MANTENIMIENTOS, API_SALAS, API_VERIFICACIONES } from '../config/api';
+import { API_EQUIPOS, API_FALLAS, API_INVENTARIO, API_MANTENIMIENTOS, API_REPORTES, API_SALAS, API_VERIFICACIONES } from '../config/api';
 import {
   EditarEquipo,
   EditarSala,
@@ -185,6 +185,16 @@ export class InventarioService {
   registrarVerificacion(datos: NuevaVerificacion, idSala: number): Observable<Verificacion> {
     const params = new HttpParams().set('idSala', idSala);
     return this.http.post<Verificacion>(API_VERIFICACIONES, datos, { params });
+  }
+
+  /* ----------------------------- Reportes ----------------------------- */
+
+  descargarHistorialEquipoPdf(idEquipo: number): Observable<Blob> {
+    return this.http.get(`${API_REPORTES}/inventario/historial/${idEquipo}/pdf`, { responseType: 'blob' });
+  }
+
+  descargarHistorialEquipoExcel(idEquipo: number): Observable<Blob> {
+    return this.http.get(`${API_REPORTES}/inventario/historial/${idEquipo}/excel`, { responseType: 'blob' });
   }
 
   /* ------------------------------- Altas ------------------------------- */

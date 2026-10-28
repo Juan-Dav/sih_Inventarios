@@ -84,9 +84,13 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
               </p>
             </div>
 
-            <span class="etiqueta-estado" [class]="estiloEquipo(datos.equipo.estado).clases">
-              {{ estiloEquipo(datos.equipo.estado).texto }}
-            </span>
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" class="botón boton-acento" (click)="descargarHistorial('pdf')">Descargar PDF</button>
+              <button type="button" class="botón" (click)="descargarHistorial('excel')">Descargar Excel</button>
+              <span class="etiqueta-estado" [class]="estiloEquipo(datos.equipo.estado).clases">
+                {{ estiloEquipo(datos.equipo.estado).texto }}
+              </span>
+            </div>
           </div>
 
           <div class="mt-5 grid gap-4 sm:grid-cols-3">
@@ -274,5 +278,33 @@ protected readonly nombreEquipo = nombreEquipo;
 
   protected sinResolver(datos: HistorialEquipo): number {
     return datos.fallas.filter((falla) => falla.estado !== 'RESUELTO').length;
+  }
+
+  protected descargarHistorial(tipo: 'pdf' | 'excel'): void {
+    const id = this.equipoSeleccionado();
+    if (id === null) {
+      this.aviso.set({ tipo: 'error', texto: 'Selecciona un equipo para descargar su historial.' });
+      return;
+    }
+
+    const solicitud = tipo === 'pdf' ? this.inventario.descargarHistorialEquipoPdf(id) : this.inventario.descargarHistorialEquipoExcel(id);
+
+    solicitud.subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const fecha = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        a.download = tipo === 'pdf' ? `historial_equipo_${id}_${fecha}.pdf` : `historial_equipo_${id}_${fecha}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        this.aviso.set({ tipo: 'exito', texto: 'Historial descargado correctamente.' });
+      },
+      error: (error: unknown) => {
+        this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
+      },
+    });
   }
 }

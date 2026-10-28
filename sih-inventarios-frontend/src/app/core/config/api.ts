@@ -23,3 +23,6 @@ export const API_INVENTARIO = `${API_BASE}/inventario`;
 
 /** Conteos físicos de las aulas, los hace el técnico o el administrador. */
 export const API_VERIFICACIONES = `${API_BASE}/verificaciones`;
+
+/** Reportes PDF/Excel. */
+export const API_REPORTES = `${API_BASE}/reportes`;
