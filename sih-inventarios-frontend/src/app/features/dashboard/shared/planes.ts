@@ -8,6 +8,7 @@ import {
 } from '../../../core/models/plan.model';
 import { InventarioService } from '../../../core/services/inventario.service';
 import { PlanService } from '../../../core/services/plan.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 type Aviso = { tipo: 'exito' | 'error'; texto: string };
 
@@ -38,8 +39,11 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
             <h2 class="titulo-modulo">Plan del sistema</h2>
             <p class="subtitulo-modulo">
               Define cuántas aulas y cuántos equipos se pueden registrar. El plan es de la
-              institución: lo que contrate cualquiera de los tres paneles aplica para todos.
+              institución.
             </p>
+            @if (!esAdmin()) {
+              <p class="mt-2 text-sm text-amber-300">Solo el administrador puede gestionar la suscripción. Por favor, comuníquese con el administrador para comprar, activar, renovar o cancelar el plan.</p>
+            }
           </div>
 
           <span class="etiqueta-estado" [class]="plan().esPremium ? et.premium : et.gratuito">
@@ -155,9 +159,9 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
             </div>
 
             <p class="mt-3 font-display text-2xl font-extrabold text-ink-900">
-              {{ formatearPesos(precio) }}
+              $150.000 COP
             </p>
-            <p class="text-xs text-ink-500">de la institución, compra simulada</p>
+            <p class="text-xs text-ink-500">Mensual • Compra simulada (sin pasarela)</p>
 
             <ul class="mt-4 space-y-2 text-sm text-ink-600">
               <li>Aulas ilimitadas.</li>
@@ -178,16 +182,19 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                 Comprobante <span class="font-bold">{{ plan().referenciaPago }}</span>. Las aulas
                 y los equipos no tienen tope.
               </p>
+              <p class="mt-2 text-xs text-ink-500">$150.000 COP / mes • Pago simulado (sin pasarela)</p>
             </div>
 
-            <button
-              type="button"
-              class="botón border border-pop-400/40 bg-pop-500/15 text-[#f9a8d4] hover:bg-pop-500/25"
-              [disabled]="operando()"
-              (click)="pedirCancelacion()"
-            >
-              {{ cancelando() ? 'Cancelando…' : 'Cancelar plan' }}
-            </button>
+            @if (esAdmin()) {
+              <button
+                type="button"
+                class="botón border border-pop-400/40 bg-pop-500/15 text-[#f9a8d4] hover:bg-pop-500/25"
+                [disabled]="operando()"
+                (click)="pedirCancelacion()"
+              >
+                {{ cancelando() ? 'Cancelando…' : 'Cancelar plan' }}
+              </button>
+            }
           </div>
         </section>
       } @else {
@@ -196,19 +203,20 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
             <div>
               <h2 class="titulo-modulo">Contratar plan Premium</h2>
               <p class="mt-1 max-w-md text-sm text-ink-600">
-                Quita los límites de aulas y equipos y deja la institución con el inventario
-                completo. Compra simulada: no se pide tarjeta ni se cobra nada real.
+                Quita los límites de aulas y equipos. $150.000 COP mensuales. Compra simulada: no se pide tarjeta ni se cobra nada real.
               </p>
             </div>
 
-            <button
-              type="button"
-              class="botón bg-gradient-to-r from-brand-600 to-pop-600 text-white shadow-lg shadow-brand-600/25 hover:shadow-brand-600/40"
-              [disabled]="operando()"
-              (click)="comprar()"
-            >
-              {{ comprando() ? 'Activando…' : 'Contratar por ' + formatearPesos(precio) }}
-            </button>
+            @if (esAdmin()) {
+              <button
+                type="button"
+                class="botón bg-gradient-to-r from-brand-600 to-pop-600 text-white shadow-lg shadow-brand-600/25 hover:shadow-brand-600/40"
+                [disabled]="operando()"
+                (click)="comprar()"
+              >
+                {{ comprando() ? 'Activando…' : 'Contratar por $150.000 COP / mes' }}
+              </button>
+            }
           </div>
         </section>
       }
@@ -384,6 +392,17 @@ export class Planes {
    * "Contratar por $ 0".
    */
   protected readonly precio = PRECIO_PREMIUM;
+  private readonly authService = inject(AuthService);
+
+  protected esAdmin(): boolean {
+    try {
+      const sesion = (this.authService as any).sesion?.();
+      return sesion?.rol === 'ADMINISTRADOR';
+    } catch {
+      return false;
+    }
+  }
+
 
   /**
    * Topes del plan gratuito, tal y como los pinta la tarjeta de "Opciones".
@@ -426,14 +445,16 @@ export class Planes {
   }
 
   protected comprar(): void {
+    if (!this.esAdmin()) {
+      this.aviso.set({ tipo: 'error', texto: 'Solo el administrador puede gestionar la suscripción.' });
+      return;
+    }
     this.aviso.set(null);
     this.comprando.set(true);
 
     this.planService.comprarPremium().subscribe({
       next: (estado) => {
         this.comprando.set(false);
-        // El plan nuevo destapa más aulas de las que ya hay, así que se recarga
-        // el inventario para que los contadores no queden cortos.
         this.inventario.cargarTodo();
         this.agradecido.set(estado.referenciaPago ?? 'SIM-Confirmada');
         this.aviso.set(null);
@@ -446,6 +467,10 @@ export class Planes {
   }
 
   protected cancelar(): void {
+    if (!this.esAdmin()) {
+      this.aviso.set({ tipo: 'error', texto: 'Solo el administrador puede gestionar la suscripción.' });
+      return;
+    }
     this.aviso.set(null);
     this.cancelando.set(true);
 
@@ -454,8 +479,6 @@ export class Planes {
         this.cancelando.set(false);
         this.confirmandoCancelacion.set(false);
         this.agradecido.set(null);
-        // Los avisos de límite del panel se calculan desde este mismo estado,
-        // así que sin recargar quedarían mostrando el Premium un rato más.
         this.inventario.cargarTodo();
         this.aviso.set({
           tipo: 'exito',
@@ -471,4 +494,5 @@ export class Planes {
       },
     });
   }
+
 }

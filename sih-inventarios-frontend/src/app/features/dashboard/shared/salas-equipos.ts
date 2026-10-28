@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 import {
   ESTADOS_EQUIPO,
@@ -12,6 +13,7 @@ import {
 import { InventarioService } from '../../../core/services/inventario.service';
 import { PlanService } from '../../../core/services/plan.service';
 import { Kpi } from '../../../core/ui/kpi/kpi';
+import { environment } from '../../../../environments/environment';
 
 
 type Aviso = { tipo: 'exito' | 'error'; texto: string };
@@ -532,6 +534,7 @@ export class SalasEquipos implements OnInit {
 
   /** Solo se consulta para avisar del límite de salas del plan gratuito. */
   protected readonly planService = inject(PlanService);
+  private readonly http = inject(HttpClient);
 
   /** Cuando es `false` el módulo es de solo lectura: no se pintan los formularios. */
   readonly permiteCrear = input(false);
