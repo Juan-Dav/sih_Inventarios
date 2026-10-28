@@ -85,8 +85,11 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-              <button type="button" class="botón boton-acento" (click)="descargarHistorial('pdf')">Descargar PDF</button>
-              <button type="button" class="botón" (click)="descargarHistorial('excel')">Descargar Excel</button>
+              <select class="campo max-w-xs" (change)="descargarHistorial($any($event.target).value)">
+                <option value="" disabled selected>Descargar historial</option>
+                <option value="pdf">PDF</option>
+                <option value="excel">Excel</option>
+              </select>
               <span class="etiqueta-estado" [class]="estiloEquipo(datos.equipo.estado).clases">
                 {{ estiloEquipo(datos.equipo.estado).texto }}
               </span>
@@ -280,7 +283,10 @@ protected readonly nombreEquipo = nombreEquipo;
     return datos.fallas.filter((falla) => falla.estado !== 'RESUELTO').length;
   }
 
-  protected descargarHistorial(tipo: 'pdf' | 'excel'): void {
+  protected descargarHistorial(tipo: string): void {
+    if (tipo !== 'pdf' && tipo !== 'excel') {
+      return;
+    }
     const id = this.equipoSeleccionado();
     if (id === null) {
       this.aviso.set({ tipo: 'error', texto: 'Selecciona un equipo para descargar su historial.' });
