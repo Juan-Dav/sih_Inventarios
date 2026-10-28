@@ -152,6 +152,11 @@ export const routes: Routes = [
           import('./features/dashboard/admin/inventario-general').then((m) => m.InventarioGeneral),
       },
       {
+        path: 'catalogo',
+        title: 'Catálogo de equipos',
+        loadComponent: () => import('./features/catalogo/catalogo-equipos').then((m) => m.CatalogoEquipos),
+      },
+      {
         path: 'usuarios',
         title: 'Cuentas y plan',
         loadComponent: () =>
@@ -165,5 +170,12 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'catalogo-equipos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/catalogo/catalogo-equipos').then((m) => m.CatalogoEquipos),
+    title: 'Catálogo de equipos',
+  },
   { path: '**', redirectTo: '' },
 ];
+

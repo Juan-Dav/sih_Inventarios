@@ -1,0 +1,52 @@
+<section class="min-h-screen bg-slate-950 text-white px-4 py-8">
+  <div class="max-w-7xl mx-auto">
+    <header class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold">Catálogo de equipos</h1>
+      <p class="text-slate-400 mt-2">Vista independiente con búsqueda, filtros y detalles de custodia</p>
+    </header>
+
+    <div class="flex flex-col md:flex-row gap-4 mb-6">
+      <input
+        type="text"
+        class="flex-1 px-4 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:border-cyan-400"
+        placeholder="Buscar por código, nombre, marca o modelo..."
+        [ngModel]="busqueda()"
+        (ngModelChange)="busqueda.set($event)"
+      />
+      <button class="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold" (click)="cargar()">
+        Actualizar
+      </button>
+    </div>
+
+    <div *ngIf="cargando()" class="text-center py-12 text-slate-400">Cargando catálogo...</div>
+    <div *ngIf="error()" class="text-center py-12 text-red-400">{{ error() }}</div>
+
+    <div *ngIf="!cargando() && !error()" class="overflow-x-auto bg-slate-900/60 rounded-xl border border-slate-800">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-800/60">
+          <tr>
+            <th class="text-left p-3">Código</th>
+            <th class="text-left p-3">Nombre</th>
+            <th class="text-left p-3">Marca/Modelo</th>
+            <th class="text-left p-3">Estado</th>
+            <th class="text-left p-3">Sala (ubicación física)</th>
+            <th class="text-left p-3">Área / Depto</th>
+            <th class="text-left p-3">Responsable de custodia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let eq of equiposFiltrados()" class="border-t border-slate-800 hover:bg-slate-800/40">
+            <td class="p-3 font-mono">{{ eq.codigo }}</td>
+            <td class="p-3">{{ eq.nombreEquipo || eq.caracteristicas }}</td>
+            <td class="p-3">{{ eq.marca }} {{ eq.modelo }}</td>
+            <td class="p-3">{{ eq.estado }}</td>
+            <td class="p-3">{{ eq.sala?.nombre }}</td>
+            <td class="p-3">{{ eq.area?.nombre }} / {{ eq.departamento?.nombre }}</td>
+            <td class="p-3">{{ eq.responsableCustodia?.nombreCompleto }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="equiposFiltrados().length === 0" class="text-center py-8 text-slate-400">Sin resultados</div>
+    </div>
+  </div>
+</section>
