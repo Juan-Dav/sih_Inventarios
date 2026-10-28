@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 
 import {
+  Equipo,
   ResumenInventario,
+  estiloDeEquipo,
   formatearFecha,
   nombreEquipo,
 } from '../../../core/models/inventario.model';
@@ -98,47 +100,57 @@ import { Kpi } from '../../../core/ui/kpi/kpi';
               <p>Registra la primera aula para empezar a llevar el inventario.</p>
             </div>
           } @else {
-            <div class="tabla-envoltura mt-5">
-              <table class="tabla">
-                <thead>
-                  <tr>
-                    <th>Aula</th>
-                    <th>Equipos</th>
-                    <th>Operativos</th>
-                    <th>En mantenimiento</th>
-                    <th>Fuera de servicio</th>
-                    <th>Último conteo</th>
-                    <th>Faltantes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (sala of datos.salas; track sala.salaId) {
-                    <tr>
-                      <td class="font-semibold text-ink-900">{{ sala.sala }}</td>
-                      <td>{{ sala.equiposRegistrados }}</td>
-                      <td class="txt-ok">{{ sala.equiposOperativos }}</td>
-                      <td class="txt-espera">{{ sala.equiposEnMantenimiento }}</td>
-                      <td class="txt-alerta">{{ sala.equiposFueraDeServicio }}</td>
-                      <td class="whitespace-nowrap">
-                        @if (sala.ultimaVerificacion) {
-                          {{ fecha(sala.ultimaVerificacion) }}
-                        } @else {
-                          <span class="text-ink-500">Sin recorrer</span>
-                        }
-                      </td>
-                      <td>
-                        @if (sala.equiposFaltantes === null) {
-                          <span class="text-ink-500">—</span>
-                        } @else if (sala.equiposFaltantes > 0) {
-                          <span class="font-bold txt-alerta">{{ sala.equiposFaltantes }}</span>
-                        } @else {
-                          <span class="txt-ok">0</span>
-                        }
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
+            <div class="mt-5 flex flex-col gap-4">
+              @for (sala of datos.salas; track sala.salaId) {
+                <div class="rounded-2xl border border-ink-200 bg-white/5 overflow-hidden">
+                  <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-brand-600/20 to-aqua-500/10">
+                    <div>
+                      <h3 class="text-lg font-bold text-ink-900">{{ sala.sala }}</h3>
+                      <p class="text-xs text-ink-600">Equipos registrados: {{ sala.equiposRegistrados }} / Capacidad: {{ sala.capacidadMaxima }}</p>
+                    </div>
+                    <select class="campo max-w-xs" (change)="descargarHistorialSala(sala.salaId, $any($event.target).value)">
+                      <option value="" disabled selected>Descargar historial de la sala</option>
+                      <option value="pdf">PDF</option>
+                      <option value="excel">Excel</option>
+                    </select>
+                  </div>
+                  <div class="px-5 py-4">
+                    <div class="flex flex-wrap gap-2 text-xs text-ink-600 mb-3">
+                      <span class="px-2 py-1 rounded-full bg-mint-400/15 txt-ok">Operativos: {{ sala.equiposOperativos }}</span>
+                      <span class="px-2 py-1 rounded-full bg-sun-400/15 txt-espera">En mantenimiento: {{ sala.equiposEnMantenimiento }}</span>
+                      <span class="px-2 py-1 rounded-full bg-pop-500/15 txt-alerta">Fuera de servicio: {{ sala.equiposFueraDeServicio }}</span>
+                      @if (sala.ultimaVerificacion) {
+                        <span class="px-2 py-1 rounded-full bg-ink-100">Último conteo: {{ fecha(sala.ultimaVerificacion) }}</span>
+                      } @else {
+                        <span class="px-2 py-1 rounded-full bg-ink-100">Sin recorrer</span>
+                      }
+                      @if (sala.equiposFaltantes === null) {
+                        <span class="px-2 py-1 rounded-full bg-ink-100">Faltantes: —</span>
+                      } @else if (sala.equiposFaltantes > 0) {
+                        <span class="px-2 py-1 rounded-full bg-pop-500/15 txt-alerta">Faltantes: {{ sala.equiposFaltantes }}</span>
+                      } @else {
+                        <span class="px-2 py-1 rounded-full bg-mint-400/15 txt-ok">Faltantes: 0</span>
+                      }
+                    </div>
+                    <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                      @for (equipo of equiposDeSala(sala.salaId); track equipo.id) {
+                        <div class="flex items-center justify-between rounded-xl border border-ink-200 px-3 py-2">
+                          <div>
+                            <p class="font-bold text-ink-900">{{ equipo.codigo }}</p>
+                            <p class="text-xs text-ink-600">{{ nombreEquipo(equipo) }}</p>
+                            <p class="text-xs text-ink-500">{{ equipo.caracteristicas || 'Sin características' }}</p>
+                          </div>
+                          <span class="etiqueta-estado" [class]="estiloEquipo(equipo.estado).clases">
+                            {{ estiloEquipo(equipo.estado).texto }}
+                          </span>
+                        </div>
+                      } @empty {
+                        <p class="text-xs text-ink-500">Sin equipos registrados en esta sala.</p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
             </div>
           }
         </section>
@@ -207,7 +219,8 @@ export class InventarioGeneral implements OnInit {
   protected readonly error = signal<string | null>(null);
 
   protected readonly fecha = formatearFecha;
-protected readonly nombreEquipo = nombreEquipo;
+  protected readonly nombreEquipo = nombreEquipo;
+  protected readonly estiloEquipo = estiloDeEquipo;
 
   /**
    * Fallas sin resolver.
@@ -231,6 +244,48 @@ protected readonly nombreEquipo = nombreEquipo;
     return `${datos.equiposOperativos} de ${datos.totalEquipos} equipos en servicio`;
   });
 
+  protected equiposDeSala(salaId: number): Equipo[] {
+    return this.inventario.equipos().filter((equipo) => equipo.sala?.id === salaId);
+  }
+
+  protected descargarHistorialSala(salaId: number, tipo: string): void {
+    if (tipo !== 'pdf' && tipo !== 'excel') {
+      return;
+    }
+    const equipos = this.equiposDeSala(salaId);
+    if (equipos.length === 0) {
+      this.error.set('No hay equipos en esta sala para generar el historial.');
+      return;
+    }
+    this.error.set(null);
+    const peticiones = equipos.map((e) =>
+      tipo === 'pdf' ? this.inventario.descargarHistorialEquipoPdf(e.id) : this.inventario.descargarHistorialEquipoExcel(e.id),
+    );
+    let completados = 0;
+    peticiones.forEach((p, idx) => {
+      p.subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const fecha = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+          a.download = tipo === 'pdf' ? `historial_sala_${salaId}_equipo_${equipos[idx].codigo}_${fecha}.pdf` : `historial_sala_${salaId}_equipo_${equipos[idx].codigo}_${fecha}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          completados++;
+          if (completados === peticiones.length) {
+            this.error.set(null);
+          }
+        },
+        error: (err: unknown) => {
+          this.error.set(this.inventario.leerError(err));
+        },
+      });
+    });
+  }
+
   ngOnInit(): void {
     this.cargar();
   }
@@ -238,6 +293,7 @@ protected readonly nombreEquipo = nombreEquipo;
   protected cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
+    this.inventario.cargarTodo();
 
     this.inventario.obtenerResumen().subscribe({
       next: (resumen) => {
