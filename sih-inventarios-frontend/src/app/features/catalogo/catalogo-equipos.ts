@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { API_EQUIPOS } from '../../core/config/api';
 
 @Component({
   selector: 'app-catalogo-equipos',
@@ -26,7 +26,7 @@ export class CatalogoEquipos implements OnInit {
   cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
-    this.http.get<any[]>(`${environment.apiBaseUrl}/equipos`).subscribe({
+    this.http.get<any[]>(API_EQUIPOS).subscribe({
       next: (data: any[]) => {
         this.equipos.set(data || []);
         this.cargando.set(false);
