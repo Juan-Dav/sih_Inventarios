@@ -233,7 +233,7 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                     casi nunca se anotan y no deben frenar el alta. Cuando sí se
                     escriben, el inventario general los muestra junto al
                     código, que es donde sirven.
-                  -->
+                    -->
                   <div>
                     <label class="rotulo" for="se-eq-marca">Marca</label>
                     <input
@@ -453,7 +453,7 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                         columnas separadas la marca quedaba lejos del código y en
                         pantallas estrechas desaparecía de la vista, que es justo
                         el dato que sirve para reconocer la máquina.
-                      -->
+                        -->
                       <td>
                         <span class="font-bold text-ink-900">{{ item.codigo }}</span>
                         <span class="mt-0.5 block text-xs text-ink-500">
@@ -476,7 +476,7 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                             editable pero luego el backend rechaza con un 403
                             solo confunde: la etiqueta al lado ya dice el
                             estado.
-                          -->
+                            -->
                           <div class="flex flex-wrap items-center gap-2">
                             <button
                               type="button"
