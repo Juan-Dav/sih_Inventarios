@@ -13,7 +13,6 @@ import {
 import { InventarioService } from '../../../core/services/inventario.service';
 import { PlanService } from '../../../core/services/plan.service';
 import { Kpi } from '../../../core/ui/kpi/kpi';
-import { environment } from '../../../../environments/environment';
 
 
 type Aviso = { tipo: 'exito' | 'error'; texto: string };

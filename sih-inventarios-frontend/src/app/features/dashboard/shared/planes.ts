@@ -396,7 +396,7 @@ export class Planes {
 
   protected esAdmin(): boolean {
     try {
-      const sesion = (this.authService as any).sesion?.();
+      const sesion = (this.authService as any).sesion && (this.authService as any).sesion();
       return sesion?.rol === 'ADMINISTRADOR';
     } catch {
       return false;

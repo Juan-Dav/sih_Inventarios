@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { InventarioService } from '../../core/services/inventario.service';
-import { Equipo } from '../../core/models/inventario.model';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-catalogo-equipos',
@@ -12,12 +12,12 @@ import { Equipo } from '../../core/models/inventario.model';
   styleUrl: './catalogo-equipos.css',
 })
 export class CatalogoEquipos implements OnInit {
-  equipos = signal<Equipo[]>([]);
+  equipos = signal<any[]>([]);
   busqueda = signal('');
   cargando = signal(true);
   error = signal<string | null>(null);
 
-  constructor(private inventarioService: InventarioService) {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     this.cargar();
@@ -26,25 +26,25 @@ export class CatalogoEquipos implements OnInit {
   cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
-    this.inventarioService.obtenerEquipos().subscribe({
-      next: (data) => {
+    this.http.get<any[]>(`${environment.apiBaseUrl}/equipos`).subscribe({
+      next: (data: any[]) => {
         this.equipos.set(data || []);
         this.cargando.set(false);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.error.set(err?.error?.message || 'Error al cargar catálogo');
         this.cargando.set(false);
       },
     });
   }
 
-  equiposFiltrados(): Equipo[] {
+  equiposFiltrados(): any[] {
     const q = this.busqueda().toLowerCase().trim();
     if (!q) return this.equipos();
-    return this.equipos().filter((e) => {
+    return this.equipos().filter((e: any) => {
       return (
         (e.codigo || '').toLowerCase().includes(q) ||
-        ((e as any).nombreEquipo || '').toLowerCase().includes(q) ||
+        (e.nombreEquipo || '').toLowerCase().includes(q) ||
         (e.marca || '').toLowerCase().includes(q) ||
         (e.modelo || '').toLowerCase().includes(q)
       );
