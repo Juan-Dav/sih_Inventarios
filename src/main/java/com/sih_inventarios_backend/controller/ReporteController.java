@@ -81,4 +81,24 @@ public class ReporteController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/historial/equipo/{idEquipo}/pdf")
+    public ResponseEntity<byte[]> historialEquipoPdfAlt(@PathVariable Long idEquipo) {
+        return historialEquipoPdf(idEquipo);
+    }
+
+    @GetMapping("/historial/equipo/{idEquipo}/excel")
+    public ResponseEntity<byte[]> historialEquipoExcelAlt(@PathVariable Long idEquipo) {
+        return historialEquipoExcel(idEquipo);
+    }
+
+    @GetMapping("/equipo/{idEquipo}/historial/pdf")
+    public ResponseEntity<byte[]> historialEquipoPdfAlt2(@PathVariable Long idEquipo) {
+        return historialEquipoPdf(idEquipo);
+    }
+
+    @GetMapping("/equipo/{idEquipo}/historial/excel")
+    public ResponseEntity<byte[]> historialEquipoExcelAlt2(@PathVariable Long idEquipo) {
+        return historialEquipoExcel(idEquipo);
+    }
 }

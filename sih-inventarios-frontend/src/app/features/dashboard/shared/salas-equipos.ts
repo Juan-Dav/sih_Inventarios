@@ -13,6 +13,7 @@ import {
 import { InventarioService } from '../../../core/services/inventario.service';
 import { PlanService } from '../../../core/services/plan.service';
 import { Kpi } from '../../../core/ui/kpi/kpi';
+import { API_BASE } from '../../../core/config/api';
 
 
 type Aviso = { tipo: 'exito' | 'error'; texto: string };
@@ -476,6 +477,14 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                             solo confunde: la etiqueta al lado ya dice el
                             estado.
                           -->
+                          <button
+                            type="button"
+                            class="botón boton-secundario boton-fila"
+                            [disabled]="generandoQrId() === item.id"
+                            (click)="generarQr(item.id)"
+                          >
+                            {{ generandoQrId() === item.id ? 'Generando...' : 'Generar QR' }}
+                          </button>
                           @if (permiteCambiarEstado()) {
                             <select
                               class="campo !w-auto !py-1 !text-xs"
@@ -575,6 +584,7 @@ export class SalasEquipos implements OnInit {
   protected readonly cambiandoEstado = signal(false);
   protected readonly operando = signal(false);
   protected readonly aviso = signal<Aviso | null>(null);
+  protected readonly generandoQrId = signal<number | null>(null);
 
   protected sala = { nombre: '', capacidadMaxima: 12 };
 
@@ -885,6 +895,21 @@ export class SalasEquipos implements OnInit {
       next: () => this.cambiandoEstado.set(false),
       error: (error: unknown) => {
         this.cambiandoEstado.set(false);
+        this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
+      },
+    });
+  }
+
+  protected generarQr(id: number): void {
+    this.generandoQrId.set(id);
+    this.aviso.set(null);
+    this.http.post(`${API_BASE}/equipos/${id}/generar-qr`, {}).subscribe({
+      next: () => {
+        this.generandoQrId.set(null);
+        this.aviso.set({ tipo: 'exito', texto: 'Código QR generado correctamente.' });
+      },
+      error: (error: unknown) => {
+        this.generandoQrId.set(null);
         this.aviso.set({ tipo: 'error', texto: this.inventario.leerError(error) });
       },
     });
