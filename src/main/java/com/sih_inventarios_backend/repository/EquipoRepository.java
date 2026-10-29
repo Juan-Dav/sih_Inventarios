@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EquipoRepository extends JpaRepository<Equipo, Long> {
 
@@ -35,4 +36,7 @@ public interface EquipoRepository extends JpaRepository<Equipo, Long> {
 
     /** El más reciente de una sala, para saber cuándo se hizo el último conteo. */
     List<Equipo> findBySalaIdOrderByIdDesc(Long salaId);
+
+    /** Busca un equipo por el código que viaja dentro del QR, sin traer la tabla entera. */
+    Optional<Equipo> findByCodigoQr(String codigoQr);
 }

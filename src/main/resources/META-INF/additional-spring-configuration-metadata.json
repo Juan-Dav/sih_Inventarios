@@ -45,6 +45,12 @@
       "type": "java.lang.Long",
       "defaultValue": 150000,
       "description": "Precio del plan Premium en pesos colombianos. La compra es simulada: no hay pasarela de pago detras."
+    },
+    {
+      "name": "app.demo.seed",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Si es true, al arrancar se completa el aula con doce equipos de ejemplo (operativos, en mantenimiento y fuera de servicio) y su historial de fallas y mantenimientos. Solo crea lo que falta, asi que se puede dejar encendido; DEMO_SEED=false lo desactiva."
     }
   ]
 }
