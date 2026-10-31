@@ -33,6 +33,15 @@ export class AuthService {
   readonly autenticado = computed(() => this.usuarioSignal() !== null);
   readonly rol = computed<Rol | null>(() => this.usuarioSignal()?.rol ?? null);
 
+  /**
+   * `true` solo para la cuenta ADMINISTRADOR.
+   *
+   * Lo usan los módulos compartidos para ocultar las acciones exclusivas del
+   * administrador. No sustituye al control del backend: allí cada endpoint
+   * vuelve a validar el rol.
+   */
+  readonly esAdmin = computed(() => this.rol() === 'ADMINISTRADOR');
+
   /** A dónde debe ir este usuario según su rol. */
   readonly dashboardActual = computed<string | null>(() => {
     const rol = this.rol();

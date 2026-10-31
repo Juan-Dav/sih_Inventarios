@@ -2,9 +2,11 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { FormsModule } from '@angular/forms';
 
 import { ESTILO_ESTADO_USUARIO, Usuario } from '../../../core/models/plan.model';
+import { AuthService } from '../../../core/services/auth.service';
 import { PlanService } from '../../../core/services/plan.service';
 import { RolesService } from '../../../core/services/roles.service';
 import { InventarioService } from '../../../core/services/inventario.service';
+import { Dialogo } from '../../../core/ui/dialogo/dialogo';
 import { Planes } from '../shared/planes';
 
 type Aviso = { tipo: 'exito' | 'error'; texto: string };
@@ -18,7 +20,7 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
  */
 @Component({
   selector: 'app-usuarios-plan',
-  imports: [FormsModule, Planes],
+  imports: [FormsModule, Planes, Dialogo],
   styleUrls: ['../../../core/ui/formulario.css'],
   template: `
     <div class="flex flex-col gap-6">
@@ -190,6 +192,19 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                         >
                           {{ estaActivo(usuario) ? 'Desactivar' : 'Activar' }}
                         </button>
+                        <button
+                          type="button"
+                          class="botón boton-fila bg-pop-600 text-white hover:bg-pop-700"
+                          [disabled]="operando() || esMiCuenta(usuario)"
+                          [title]="
+                            esMiCuenta(usuario)
+                              ? 'No puedes eliminar tu propia cuenta'
+                              : 'Eliminar cuenta'
+                          "
+                          (click)="eliminar(usuario)"
+                        >
+                          Eliminar
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -220,12 +235,47 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
           {{ mensaje.texto }}
         </p>
       }
+
+      <!-- Confirmación en dos pasos para que una cuenta no se borre por un clic
+           accidental. El backend vuelve a validar el rol y protege al último
+           administrador, así que esta ventana es solo la parte visible. -->
+      @if (cuentaAEliminar(); as cuenta) {
+        <app-dialogo
+          tipo="pregunta"
+          [titulo]="pasoConfirmacion() === 1 ? 'Eliminar cuenta' : 'Última confirmación'"
+          [mensaje]="
+            pasoConfirmacion() === 1
+              ? 'Se eliminará permanentemente la cuenta de ' +
+                cuenta.nombre +
+                ' (' +
+                cuenta.correo +
+                '), con rol ' +
+                cuenta.rol.nombre +
+                '. Esta acción no se puede deshacer.'
+              : '¿Confirmas que quieres borrar definitivamente la cuenta de ' +
+                cuenta.nombre +
+                '? Se eliminarán sus datos personales y no se podrá recuperar.'
+          "
+          [textoAccion]="
+            operando()
+              ? 'Eliminando…'
+              : pasoConfirmacion() === 1
+                ? 'Continuar'
+                : 'Eliminar definitivamente'
+          "
+          textoCancelar="Cancelar"
+          (cerrado)="cerrarConfirmacion()"
+          (confirmar)="confirmarPaso()"
+        />
+      }
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuariosPlan implements OnInit {
   protected readonly planService = inject(PlanService);
+
+  private readonly auth = inject(AuthService);
 
   private readonly rolesService = inject(RolesService);
 
@@ -246,6 +296,12 @@ export class UsuariosPlan implements OnInit {
   /** Cuenta abierta en el formulario, o `null` si el formulario está creando una nueva. */
   protected readonly editando = signal<Usuario | null>(null);
 
+  /** Cuenta seleccionada para borrar. Mientras tenga valor se muestra la ventana. */
+  protected readonly cuentaAEliminar = signal<Usuario | null>(null);
+
+  /** 1 = primera advertencia; 2 = confirmación definitiva. */
+  protected readonly pasoConfirmacion = signal<1 | 2>(1);
+
   protected form = { nombre: '', correo: '', contrasena: '', rol: 'DOCENTE' };
 
   ngOnInit(): void {
@@ -264,6 +320,11 @@ export class UsuariosPlan implements OnInit {
 
   protected estaActivo(usuario: Usuario): boolean {
     return usuario.estado === 'ACTIVO';
+  }
+
+  /** La cuenta con la que se está mirando el panel no se puede borrar. */
+  protected esMiCuenta(usuario: Usuario): boolean {
+    return this.auth.usuario()?.id === usuario.id;
   }
 
   /* ---------------------------- Usuarios ---------------------------- */
@@ -364,6 +425,58 @@ export class UsuariosPlan implements OnInit {
           `${usuario.nombre} quedó ${siguiente === 'ACTIVO' ? 'activo' : 'desactivado'}.`,
         ),
       error: (error: unknown) => this.fallar(error),
+    });
+  }
+
+  /** Abre la primera de las dos confirmaciones; no borra nada todavía. */
+  protected eliminar(usuario: Usuario): void {
+    if (this.esMiCuenta(usuario)) {
+      this.aviso.set({ tipo: 'error', texto: 'No puedes eliminar tu propia cuenta.' });
+      return;
+    }
+
+    this.aviso.set(null);
+    this.cuentaAEliminar.set(usuario);
+    this.pasoConfirmacion.set(1);
+  }
+
+  /** Cierra la ventana sin tocar la cuenta. */
+  protected cerrarConfirmacion(): void {
+    if (this.operando()) return;
+
+    this.cuentaAEliminar.set(null);
+    this.pasoConfirmacion.set(1);
+  }
+
+  /** Pasa de la advertencia a la confirmación final, o ejecuta el borrado. */
+  protected confirmarPaso(): void {
+    if (this.operando()) return;
+
+    if (this.pasoConfirmacion() === 1) {
+      this.pasoConfirmacion.set(2);
+      return;
+    }
+
+    const usuario = this.cuentaAEliminar();
+    if (!usuario) return;
+
+    this.operando.set(true);
+
+    this.planService.eliminarUsuario(usuario.id).subscribe({
+      next: () => {
+        this.cuentaAEliminar.set(null);
+        this.pasoConfirmacion.set(1);
+        // Se recarga la lista desde el backend además de quitarla del signal:
+        // así la pantalla refleja el estado real aunque otro administrador haya
+        // cambiado algo entre tanto.
+        this.planService.cargarUsuarios();
+        this.finOperacion(`Cuenta de ${usuario.nombre} eliminada permanentemente.`);
+      },
+      error: (error: unknown) => {
+        this.cuentaAEliminar.set(null);
+        this.pasoConfirmacion.set(1);
+        this.fallar(error);
+      },
     });
   }
 

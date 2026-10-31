@@ -145,4 +145,16 @@ public class UsuarioController {
     public List<Rol> obtenerRoles() {
         return usuarioService.obtenerRoles();
     }
+
+    // 9. Eliminar cuenta
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
+        try {
+            usuarioService.eliminarUsuario(id);
+            return ResponseEntity.ok(Map.of("message", "Usuario eliminado exitosamente."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }

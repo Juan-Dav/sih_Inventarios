@@ -76,7 +76,66 @@ public class PlanService {
     @Transactional
     public Plan obtenerPlanActivo() {
         Plan plan = planRepository.findFirstByOrderByIdAsc().orElseGet(this::crearPlanGratis);
+        plan = vencerSiCorresponde(plan);
         return alinearLimitesGratuito(plan);
+    }
+
+    /**
+     * Devuelve al plan gratuito un Premium cuya fecha de vencimiento ya pasó.
+     *
+     * Sin esto, un Premium comprado hace meses seguiría quitando los topes para
+     * siempre. Se conserva la fecha de vencimiento y se marca el pago como
+     * VENCIDO para dejar constancia de que hubo una suscripción y caducó.
+     */
+    private Plan vencerSiCorresponde(Plan plan) {
+        if (!Plan.PREMIUM.equals(plan.getNombre())
+                || !Plan.PAGO_PAGADO.equals(plan.getEstadoPago())
+                || plan.getFechaVencimiento() == null
+                || plan.getFechaVencimiento().isAfter(LocalDateTime.now())) {
+            return plan;
+        }
+
+        plan.setNombre(Plan.GRATUITO);
+        plan.setPrecio(0L);
+        plan.setMaxSalas(maxSalasGratuito);
+        plan.setMaxEquiposPorSala(maxEquiposGratuito);
+        plan.setEstadoPago(Plan.PAGO_VENCIDO);
+        plan.setRenovacionAutomatica(false);
+        return planRepository.save(plan);
+    }
+
+    /** `true` si hay un Premium pagado y todavía vigente. */
+    public boolean esPremiumActivo() {
+        return esPremiumActivo(obtenerPlanActivo());
+    }
+
+    private boolean esPremiumActivo(Plan plan) {
+        return Plan.PREMIUM.equals(plan.getNombre())
+                && Plan.PAGO_PAGADO.equals(plan.getEstadoPago())
+                && (plan.getFechaVencimiento() == null
+                        || plan.getFechaVencimiento().isAfter(LocalDateTime.now()));
+    }
+
+    /**
+     * Compra simulada del Premium.
+     *
+     * Rechaza la operación si ya hay una suscripción activa: renovar es una
+     * acción distinta y no debe ocurrir por pulsar dos veces el botón de compra.
+     */
+    @Transactional
+    public Plan comprarPremium() {
+        Plan plan = obtenerPlanActivo();
+
+        if (esPremiumActivo(plan)) {
+            throw new RuntimeException(
+                    "Ya tienes una suscripción Premium activa"
+                            + (plan.getFechaVencimiento() != null
+                                    ? " hasta el " + plan.getFechaVencimiento().toLocalDate()
+                                    : "")
+                            + ". No es necesario comprarla de nuevo.");
+        }
+
+        return activarPremium();
     }
 
     /**

@@ -34,7 +34,7 @@ public class PlanController {
     @PostMapping("/comprar")
     public ResponseEntity<?> comprarPremium() {
         try {
-            planService.activarPremium();
+            planService.comprarPremium();
             return ResponseEntity.ok(planService.obtenerEstado());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));

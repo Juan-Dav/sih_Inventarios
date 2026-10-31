@@ -144,6 +144,13 @@ export class PlanService {
       .pipe(tap((actualizado) => this.reemplazar(actualizado)));
   }
 
+  /** Elimina un usuario. */
+  eliminarUsuario(id: number): Observable<void> {
+    return this.http
+      .delete<void>(`${API_USUARIOS}/${id}`)
+      .pipe(tap(() => this._usuarios.update((lista) => lista.filter((u) => u.id !== id))));
+  }
+
   /** Sustituye la cuenta editada dentro de la lista ya cargada. */
   private reemplazar(actualizado: Usuario): void {
     this._usuarios.update((lista) =>

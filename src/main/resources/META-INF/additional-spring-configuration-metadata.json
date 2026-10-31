@@ -51,6 +51,12 @@
       "type": "java.lang.Boolean",
       "defaultValue": true,
       "description": "Si es true, al arrancar se completa el aula con doce equipos de ejemplo (operativos, en mantenimiento y fuera de servicio) y su historial de fallas y mantenimientos. Solo crea lo que falta, asi que se puede dejar encendido; DEMO_SEED=false lo desactiva."
+    },
+    {
+      "name": "app.frontend.url",
+      "type": "java.lang.String",
+      "defaultValue": "http://localhost:4200",
+      "description": "URL publica del frontend que se escribe dentro del QR. Si esta vacia se usa el origen desde el que se pidio la imagen; en Render conviene definirla con la variable FRONTEND_URL."
     }
   ]
 }

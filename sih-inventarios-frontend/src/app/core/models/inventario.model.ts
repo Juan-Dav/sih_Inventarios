@@ -307,11 +307,24 @@ export interface EstadoVerificacionSala {
   verificada: boolean;
 }
 
-/** `2026-09-30T04:12:33` -> `30 sep 2026, 04:12` */
+/**
+ * `2026-09-30T04:12:33Z` -> `29 sep 2026, 23:12` (hora del dispositivo)
+ *
+ * El backend guarda los instantes en UTC. Los envían con la `Z` final, pero
+ * las respuestas antiguas o algún cliente pueden traerlos sin zona; en ese
+ * caso se interpretan como UTC y no como hora local, que era lo que hacía
+ * que un conteo de las 10:11 se viera como 15:11.
+ */
 export function formatearFecha(iso: string | null | undefined): string {
   if (!iso) return 'Sin fecha';
 
-  const fecha = new Date(iso);
+  const texto = iso.trim();
+  const soloFecha = /^\d{4}-\d{2}-\d{2}$/.test(texto);
+  const conZona = /([zZ]|[+-]\d{2}:?\d{2})$/.test(texto);
+
+  const fecha = new Date(
+    soloFecha ? `${texto}T00:00:00` : conZona ? texto : `${texto}Z`,
+  );
   if (Number.isNaN(fecha.getTime())) return 'Sin fecha';
 
   return fecha.toLocaleString('es-CO', {

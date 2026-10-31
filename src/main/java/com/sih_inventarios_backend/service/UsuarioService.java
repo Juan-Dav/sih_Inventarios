@@ -6,6 +6,8 @@ import com.sih_inventarios_backend.entity.Usuario;
 import com.sih_inventarios_backend.repository.RolRepository;
 import com.sih_inventarios_backend.repository.UsuarioRepository;
 import com.sih_inventarios_backend.security.JwtService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +36,9 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public UsuarioService(
             UsuarioRepository usuarioRepository,
@@ -181,8 +186,172 @@ public class UsuarioService {
         return rolRepository.findAll();
     }
 
+    // 8. Eliminar un usuario permanentemente
     /**
-     * 8. Valida las credenciales y devuelve el token firmado.
+     * Borra la cuenta y los datos personales que le pertenecen.
+     *
+     * El plan Premium es de la institución, no de la cuenta (vive en una sola
+     * fila de `plan_institucion`), así que no hay una suscripción por usuario
+     * que borrar aquí. Lo que sí se elimina es todo lo que apunta a la cuenta:
+     *
+     * - Fechas, fallas, historiales y licencias: se les quita la referencia para
+     *   conservar el registro del inventario, que es compartido y no debe
+     *   desaparecer con la persona.
+     * - Préstamos ya devueltos o cancelados: se eliminan porque son historial
+     *   exclusivo de esa cuenta. Si hay un préstamo activo se rechaza el borrado
+     *   para no perder el rastro de un equipo que sigue fuera.
+     * - Responsables de custodia creados por la cuenta: se eliminan si nada más
+     *   los usa; si un equipo o un préstamo los referencia, se conservan sin el
+     *   vínculo al usuario para no romper el inventario.
+     *
+     * Todo ocurre en una transacción: si una parte falla, no queda nada a medias.
+     */
+    @Transactional
+    public void eliminarUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Error: El usuario no existe."));
+
+        // Impedir que el admin se borre a sí mismo.
+        if (usuario.getId().equals(usuarioAutenticadoId())) {
+            throw new RuntimeException("Error: No puedes eliminar tu propia cuenta.");
+        }
+
+        protegerAdministradores(usuario);
+
+        // Se guardan los responsables antes de desvincularlos: después ya no se
+        // puede saber cuáles pertenecían a esta cuenta.
+        List<Long> responsables = entityManager
+                .createQuery("select r.id from ResponsableCustodia r where r.usuario.id = :id", Long.class)
+                .setParameter("id", id)
+                .getResultList();
+
+        desvincularHistoricos(id);
+        eliminarPrestamos(id);
+
+        // Si el responsable no lo usa ningún equipo, préstamo ni historial, es
+        // información exclusiva de la cuenta y se borra. Si está compartido, se
+        // conserva (ya sin usuario) para no dejar equipos sin responsable.
+        for (Long responsableId : responsables) {
+            if (!responsableEnUso(responsableId)) {
+                entityManager.createQuery("delete from ResponsableCustodia r where r.id = :id")
+                        .setParameter("id", responsableId)
+                        .executeUpdate();
+            }
+        }
+
+        usuarioRepository.delete(usuario);
+        entityManager.flush();
+    }
+
+    /**
+     * Evita que el sistema se quede sin una cuenta de administración.
+     *
+     * No basta con impedir el auto-borrado: otro administrador podría eliminar
+     * la última cuenta ADMINISTRADOR y dejar el sistema sin nadie que gestione
+     * cuentas y plan. Se exige que quede al menos otra cuenta con ese rol.
+     */
+    private void protegerAdministradores(Usuario usuario) {
+        if (usuario.getRol() == null || !ROL_ADMINISTRADOR.equals(usuario.getRol().getNombre())) {
+            return;
+        }
+
+        Long otrosAdmins = entityManager.createQuery(
+                        "select count(u) from Usuario u where u.rol.nombre = :rol and u.id <> :id",
+                        Long.class)
+                .setParameter("rol", ROL_ADMINISTRADOR)
+                .setParameter("id", usuario.getId())
+                .getSingleResult();
+
+        if (otrosAdmins == 0) {
+            throw new RuntimeException(
+                    "Error: No puedes eliminar la última cuenta de administrador. "
+                            + "Crea o activa otra cuenta ADMINISTRADOR antes de borrar esta.");
+        }
+
+        if (ESTADO_ACTIVO.equals(usuario.getEstado())) {
+            Long otrosAdminsActivos = entityManager.createQuery(
+                            "select count(u) from Usuario u where u.rol.nombre = :rol "
+                                    + "and u.estado = :estado and u.id <> :id",
+                            Long.class)
+                    .setParameter("rol", ROL_ADMINISTRADOR)
+                    .setParameter("estado", ESTADO_ACTIVO)
+                    .setParameter("id", usuario.getId())
+                    .getSingleResult();
+
+            if (otrosAdminsActivos == 0) {
+                throw new RuntimeException(
+                        "Error: Esta es la única cuenta ADMINISTRADOR activa. "
+                                + "Activa otra cuenta de administrador antes de eliminarla.");
+            }
+        }
+    }
+
+    /**
+     * Un préstamo activo ata un equipo a una persona: si se borrara la cuenta,
+     * nadie sabría a quién reclamarle la devolución. Los préstamos ya cerrados
+     * son historial de la cuenta y sí se eliminan con ella.
+     */
+    private void eliminarPrestamos(Long id) {
+        Long activos = entityManager.createQuery(
+                        "select count(p) from Prestamo p where p.usuarioPrestamo.id = :id "
+                                + "and p.estado in ('PRESTADO', 'VENCIDO')",
+                        Long.class)
+                .setParameter("id", id)
+                .getSingleResult();
+
+        if (activos > 0) {
+            throw new RuntimeException(
+                    "Error: La cuenta tiene " + activos
+                            + " préstamo(s) activo(s). Registra la devolución antes de eliminarla.");
+        }
+
+        entityManager.createQuery("delete from Prestamo p where p.usuarioPrestamo.id = :id")
+                .setParameter("id", id)
+                .executeUpdate();
+    }
+
+    /** `true` si un responsable de custodia sigue referenciado por el inventario. */
+    private boolean responsableEnUso(Long responsableId) {
+        Long equipos = contar(
+                "select count(e) from Equipo e where e.responsableCustodia.id = :id", responsableId);
+        Long prestamos = contar(
+                "select count(p) from Prestamo p where p.responsable.id = :id", responsableId);
+        Long historial = contar(
+                "select count(h) from HistorialCustodia h "
+                        + "where h.responsableAnterior.id = :id or h.responsableNuevo.id = :id",
+                responsableId);
+        Long licencias = contar(
+                "select count(l) from Licencia l where l.responsable.id = :id", responsableId);
+
+        return equipos + prestamos + historial + licencias > 0;
+    }
+
+    private Long contar(String consulta, Long id) {
+        return entityManager.createQuery(consulta, Long.class)
+                .setParameter("id", id)
+                .getSingleResult();
+    }
+
+    /** Quita la referencia al usuario de los registros históricos que lo usan. */
+    private void desvincularHistoricos(Long id) {
+        actualizar("update Verificacion v set v.tecnico = null where v.tecnico.id = :id", id);
+        actualizar("update Falla f set f.reportadoPor = null where f.reportadoPor.id = :id", id);
+        actualizar("update Falla f set f.asignadoA = null where f.asignadoA.id = :id", id);
+        actualizar("update HistorialFalla h set h.usuarioCambio = null where h.usuarioCambio.id = :id", id);
+        actualizar("update HistorialCustodia h set h.usuarioQueAsigna = null where h.usuarioQueAsigna.id = :id", id);
+        actualizar("update LicenciaEquipo l set l.instaladoPor = null where l.instaladoPor.id = :id", id);
+        actualizar("update ResponsableCustodia r set r.usuario = null where r.usuario.id = :id", id);
+        actualizar("update Prestamo p set p.usuarioEntrega = null where p.usuarioEntrega.id = :id", id);
+    }
+
+    private void actualizar(String consulta, Long id) {
+        entityManager.createQuery(consulta)
+                .setParameter("id", id)
+                .executeUpdate();
+    }
+
+    /**
+     * 9. Valida las credenciales y devuelve el token firmado.
      *
      * Las cuentas anteriores a este cambio guardaban la contraseña en texto
      * plano. Para no romperlas, si el hash almacenado no parece un BCrypt se

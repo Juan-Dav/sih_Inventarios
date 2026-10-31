@@ -176,6 +176,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/catalogo/catalogo-equipos').then((m) => m.CatalogoEquipos),
     title: 'Catálogo de equipos',
   },
+  {
+    path: 'consulta/:codigo',
+    title: 'Información del Equipo',
+    loadComponent: () => import('./features/catalogo/visor-equipo').then((m) => m.VisorEquipo),
+  },
   { path: '**', redirectTo: '' },
 ];
 

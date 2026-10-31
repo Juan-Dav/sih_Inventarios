@@ -1,0 +1,338 @@
+@if (cargando() && !equipo()) {
+  <main class="ficha-pagina ficha-centrada">
+    <section class="ficha-carga" aria-live="polite">
+      <span class="cargador" aria-hidden="true"></span>
+      <p class="carga-titulo">Leyendo la etiqueta…</p>
+      <p class="carga-texto">Estamos consultando la información del equipo.</p>
+    </section>
+  </main>
+} @else if (error() && !equipo()) {
+  <main class="ficha-pagina ficha-centrada">
+    <section class="ficha-error" role="alert">
+      <span class="error-icono" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 9v4m0 4h.01M10.3 3.9 2.4 18a1.8 1.8 0 0 0 1.6 2.7h16a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"
+          />
+        </svg>
+      </span>
+      <h1>No pudimos abrir la ficha</h1>
+      <p>{{ error() }}</p>
+      <button type="button" class="boton-accion" (click)="refrescar()">
+        Intentar de nuevo
+      </button>
+    </section>
+  </main>
+} @else if (equipo(); as ficha) {
+  <main class="ficha-pagina">
+    <div class="ficha-contenedor">
+      <!-- ============ Identidad del sistema ============ -->
+      <div class="ficha-marca">
+        <span class="marca-icono" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12.75 11.25 15 15 9.75M9 3.75l-6 2.25v6c0 3.75 2.5 7.125 6 8.25 3.5-1.125 6-4.5 6-8.25V6L9 3.75Z"
+            />
+          </svg>
+        </span>
+        <div class="marca-texto">
+          <p class="marca-nombre">SIH Inventarios</p>
+          <p class="marca-lema">Consulta pública de equipos</p>
+        </div>
+      </div>
+
+      <!-- ============ Portada de la ficha ============ -->
+      <header
+        class="ficha-hero"
+        [class.tono-operativo]="estado().clave === 'OPERATIVO'"
+        [class.tono-mantenimiento]="estado().clave === 'EN_MANTENIMIENTO'"
+        [class.tono-fuera]="estado().clave === 'FUERA_DE_SERVICIO'"
+      >
+        <span class="hero-brillo" aria-hidden="true"></span>
+
+        <div class="hero-superior">
+          <span class="chip-escaneado">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3" />
+              <path stroke-linecap="round" d="M8 8h3v3H8zM13 8h3v3h-3zM8 13h3v3H8zM13 13h3v3h-3z" />
+            </svg>
+            SIH Inventarios · Ficha escaneada
+          </span>
+
+          <span class="chip-vivo">
+            <span class="punto-vivo" aria-hidden="true"></span>
+            {{ estado().texto }}
+          </span>
+        </div>
+
+        <p class="hero-codigo">{{ ficha.codigo }}</p>
+        <h1 class="hero-titulo">{{ nombre() }}</h1>
+
+        <p class="hero-lugar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 21s7-5.1 7-11a7 7 0 1 0-14 0c0 5.9 7 11 7 11Z"
+            />
+            <circle cx="12" cy="10" r="2.6" />
+          </svg>
+          {{ lugar() }}
+        </p>
+
+        <div class="hero-pie">
+          <div>
+            <p class="hero-pie-etiqueta">Última actualización</p>
+            <p class="hero-pie-valor">{{ horaActualizacion() }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="hero-boton"
+            [disabled]="actualizando()"
+            (click)="refrescar()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+              [class.girando]="actualizando()"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 11a8 8 0 1 0-2.3 5.7" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 4v7h-7" />
+            </svg>
+            {{ actualizando() ? 'Actualizando…' : 'Actualizar' }}
+          </button>
+        </div>
+      </header>
+
+      <!-- ============ Estado actual ============ -->
+      <section
+        class="estado-ficha"
+        [class.estado-operativo]="estado().clave === 'OPERATIVO'"
+        [class.estado-mantenimiento]="estado().clave === 'EN_MANTENIMIENTO'"
+        [class.estado-fuera]="estado().clave === 'FUERA_DE_SERVICIO'"
+        aria-live="polite"
+      >
+        <span class="estado-icono" aria-hidden="true">
+          @if (estado().clave === 'OPERATIVO') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4.2 4.2L19 6.5" />
+            </svg>
+          } @else if (estado().clave === 'EN_MANTENIMIENTO') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M14.7 6.3a4.5 4.5 0 0 0-5.5 5.5L3.8 17.2a2.1 2.1 0 0 0 3 3l5.4-5.4a4.5 4.5 0 0 0 5.5-5.5l-2.6 2.6-2.5-2.5 2.1-3.1Z"
+              />
+            </svg>
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v5m0 3h.01" />
+              <circle cx="12" cy="12" r="9" />
+            </svg>
+          }
+        </span>
+
+        <div class="estado-texto">
+          <p class="estado-etiqueta">Estado actual</p>
+          <p class="estado-nombre">{{ estado().texto }}</p>
+          <p class="estado-descripcion">{{ estado().descripcion }}</p>
+        </div>
+
+        <span
+          class="chip-activo"
+          [class.chip-inactivo]="ficha.activo === false"
+        >
+          {{ ficha.activo === false ? 'Registro inactivo' : 'Registro activo' }}
+        </span>
+      </section>
+
+      @if (error(); as mensaje) {
+        <p class="aviso-ficha" role="status">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v5m0 3h.01" />
+            <circle cx="12" cy="12" r="9" />
+          </svg>
+          {{ mensaje }} Se muestran los últimos datos recibidos.
+        </p>
+      }
+
+      <!-- ============ Identificación ============ -->
+      <section class="ficha-bloque">
+        <div class="bloque-cabecera">
+          <span class="bloque-icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="4" y="3" width="16" height="18" rx="2.5" />
+              <path stroke-linecap="round" d="M8 7h8M8 11h8M8 15h5" />
+            </svg>
+          </span>
+          <div>
+            <h2>Identificación</h2>
+            <p>Datos propios del equipo</p>
+          </div>
+        </div>
+
+        <dl class="datos">
+          <div class="dato">
+            <dt>Código</dt>
+            <dd class="dato-mono">{{ ficha.codigo }}</dd>
+          </div>
+          <div class="dato">
+            <dt>Nombre</dt>
+            <dd>{{ texto(ficha.nombreEquipo) }}</dd>
+          </div>
+          <div class="dato">
+            <dt>Categoría</dt>
+            <dd>{{ texto(ficha.categoria) }}</dd>
+          </div>
+          <div class="dato">
+            <dt>Marca</dt>
+            <dd>{{ texto(ficha.marca) }}</dd>
+          </div>
+          <div class="dato">
+            <dt>Modelo</dt>
+            <dd>{{ texto(ficha.modelo) }}</dd>
+          </div>
+          <div class="dato">
+            <dt>Número de serie</dt>
+            <dd class="dato-mono">{{ texto(ficha.numeroSerie) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- ============ Ubicación ============ -->
+      <section class="ficha-bloque">
+        <div class="bloque-cabecera">
+          <span class="bloque-icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 21s7-5.1 7-11a7 7 0 1 0-14 0c0 5.9 7 11 7 11Z"
+              />
+              <circle cx="12" cy="10" r="2.6" />
+            </svg>
+          </span>
+          <div>
+            <h2>Ubicación</h2>
+            <p>Dónde está instalado el equipo</p>
+          </div>
+        </div>
+
+        <dl class="datos">
+          <div class="dato">
+            <dt>Aula</dt>
+            <dd>{{ texto(ficha.sala) }}</dd>
+          </div>
+          <div class="dato">
+            <dt>Área</dt>
+            <dd>{{ texto(ficha.area) }}</dd>
+          </div>
+          <div class="dato">
+            <dt>Departamento</dt>
+            <dd>{{ texto(ficha.departamento) }}</dd>
+          </div>
+          <div class="dato dato-ancho">
+            <dt>Ubicación detallada</dt>
+            <dd>{{ texto(ficha.ubicacionDetalle) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- ============ Registro y fechas ============ -->
+      <section class="ficha-bloque">
+        <div class="bloque-cabecera">
+          <span class="bloque-icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="3.5" y="5" width="17" height="16" rx="2.5" />
+              <path stroke-linecap="round" d="M8 3v4M16 3v4M3.5 10h17" />
+            </svg>
+          </span>
+          <div>
+            <h2>Registro y fechas</h2>
+            <p>Datos de control del equipo</p>
+          </div>
+        </div>
+
+        <dl class="datos">
+          <div class="dato">
+            <dt>Fecha de adquisición</dt>
+            <dd>{{ dia(ficha.fechaAdquisicion) }}</dd>
+          </div>
+          <div class="dato">
+            <dt>Garantía hasta</dt>
+            <dd>{{ dia(ficha.garantiaHasta) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- ============ Características y observaciones ============ -->
+      @if (ficha.caracteristicas || ficha.observaciones) {
+        <section class="ficha-bloque">
+          <div class="bloque-cabecera">
+            <span class="bloque-icono" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10" />
+              </svg>
+            </span>
+            <div>
+              <h2>Detalles</h2>
+              <p>Características y notas del inventario</p>
+            </div>
+          </div>
+
+          @if (ficha.caracteristicas) {
+            <div class="nota">
+              <p class="nota-etiqueta">Características</p>
+              <p class="nota-texto">{{ ficha.caracteristicas }}</p>
+            </div>
+          }
+
+          @if (ficha.observaciones) {
+            <div class="nota">
+              <p class="nota-etiqueta">Observaciones</p>
+              <p class="nota-texto">{{ ficha.observaciones }}</p>
+            </div>
+          }
+        </section>
+      }
+
+      <!-- ============ Acciones ============ -->
+      <div class="ficha-acciones">
+        <button
+          type="button"
+          class="boton-accion boton-ancho"
+          [disabled]="actualizando()"
+          (click)="refrescar()"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+            [class.girando]="actualizando()"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 11a8 8 0 1 0-2.3 5.7" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 4v7h-7" />
+          </svg>
+          {{ actualizando() ? 'Actualizando estado…' : 'Actualizar estado ahora' }}
+        </button>
+
+        <p class="acciones-nota">
+          La ficha se actualiza automáticamente cada 20 segundos. También puedes
+          refrescarla al volver a escanear el QR.
+        </p>
+        <p class="acciones-sello">Información del inventario institucional · SIH Inventarios</p>
+      </div>
+    </div>
+  </main>
+}

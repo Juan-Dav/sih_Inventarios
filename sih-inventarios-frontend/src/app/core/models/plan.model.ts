@@ -23,10 +23,10 @@ export interface EstadoPlan {
   equiposIlimitados: boolean;
   /**
  * `PENDIENTE` y `PAGADO` son los estados de una compra viva; `CANCELADO` deja
- * constancia de que hubo un Premium y se dio de baja, aunque el plan activo ya
- * sea el gratuito.
+ * constancia de que hubo un Premium y se dio de baja, y `VENCIDO` de que la
+ * suscripción caducó y el plan volvió al gratuito.
  */
-estadoPago: 'PENDIENTE' | 'PAGADO' | 'CANCELADO';
+estadoPago: 'PENDIENTE' | 'PAGADO' | 'CANCELADO' | 'VENCIDO';
   referenciaPago: string | null;
   fechaActivacion: string | null;
   salasRegistradas: number;

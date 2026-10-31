@@ -19,6 +19,12 @@ export const serverRoutes: ServerRoute[] = [
     path: 'dashboard-admin/**',
     renderMode: RenderMode.Client,
   },
+  // La ficha pública del QR se resuelve en el navegador con el código de la
+  // ruta. El prerender no puede generar una página por cada equipo.
+  {
+    path: 'consulta/:codigo',
+    renderMode: RenderMode.Client,
+  },
   {
     path: '**',
     renderMode: RenderMode.Prerender,

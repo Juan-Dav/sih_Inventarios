@@ -13,12 +13,16 @@ import { AuthService } from '../../../core/services/auth.service';
 type Aviso = { tipo: 'exito' | 'error'; texto: string };
 
 /**
- * Módulo de planes del técnico y del docente.
+ * Módulo de planes compartido por los tres paneles.
  *
- * Los tres paneles pueden contratar y cancelar el Premium. El plan es una sola
- * fila de la institución, así que el botón que pulse cualquiera de los dos
- * cambia el mismo dato que ve el tercero: no hay un plan por persona que se
- * pueda contradecir.
+ * Todos ven el estado del plan porque los límites de aulas y equipos afectan a
+ * cualquiera que registre inventario, pero solo el ADMINISTRADOR puede comprar,
+ * renovar o cancelar. Los otros roles ven el estado y un aviso para que pidan
+ * el cambio al administrador. El backend vuelve a validar el rol en cada
+ * endpoint: ocultar el botón no es la única protección.
+ *
+ * El plan es una sola fila de la institución, así que no hay un plan por
+ * persona que se pueda contradecir.
  *
  * Cancelar no borra inventario. Si ya hay más aulas de las que el gratuito
  * permite, el módulo lo dice antes de confirmar en vez de dejar que el
@@ -192,7 +196,7 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                 [disabled]="operando()"
                 (click)="pedirCancelacion()"
               >
-                {{ cancelando() ? 'Cancelando…' : 'Cancelar plan' }}
+                {{ cancelando() ? 'Cancelando…' : 'Cancelar Premium' }}
               </button>
             }
           </div>
@@ -214,7 +218,7 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                 [disabled]="operando()"
                 (click)="comprar()"
               >
-                {{ comprando() ? 'Activando…' : 'Contratar por $150.000 COP / mes' }}
+                {{ comprando() ? 'Activando…' : 'Comprar Premium' }}
               </button>
             }
           </div>
@@ -392,16 +396,15 @@ export class Planes {
    * "Contratar por $ 0".
    */
   protected readonly precio = PRECIO_PREMIUM;
+
   private readonly authService = inject(AuthService);
 
-  protected esAdmin(): boolean {
-    try {
-      const sesion = (this.authService as any).sesion && (this.authService as any).sesion();
-      return sesion?.rol === 'ADMINISTRADOR';
-    } catch {
-      return false;
-    }
-  }
+  /**
+   * Señal de sesión, no un método: la plantilla se repinta sola si cambia el
+   * rol. Antes se intentaba leer un `sesion()` que no existía en AuthService y
+   * por eso el administrador nunca veía los botones de compra y cancelación.
+   */
+  protected readonly esAdmin = this.authService.esAdmin;
 
 
   /**

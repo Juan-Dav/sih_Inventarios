@@ -27,7 +27,9 @@ public class QrService {
                 .orElseThrow(() -> new RuntimeException("El equipo no existe"));
         if (equipo.getCodigoQr() == null || equipo.getCodigoQr().isBlank()) {
             equipo.setCodigoQr(UUID.randomUUID().toString());
-            equipo.setRutaQr("/api/consulta/qr/" + equipo.getCodigoQr());
+            // Ruta de la ficha pública del frontend. El QR impreso ya no apunta
+            // al JSON del API, sino a la página visual de consulta.
+            equipo.setRutaQr("/consulta/" + equipo.getCodigoQr());
             equipoRepository.save(equipo);
         }
         return equipo;
