@@ -58,7 +58,11 @@ describe('SalasEquipos - modal del QR', () => {
       (req) => req.url === `${API_BASE}/equipos/${equipo.id}/qr/imagen`,
     );
     expect(peticion.request.responseType).toBe('blob');
-    peticion.flush(new Blob([new Uint8Array([137, 80, 78, 71])], { type: 'image/png' }));
+    const enlace = 'https://sih-inventarios.netlify.app/consulta/bfd733d2-64c1-4193-a049-02b9027fca2b';
+    peticion.flush(
+      new Blob([new Uint8Array([137, 80, 78, 71])], { type: 'image/png' }),
+      { headers: { 'X-Qr-Url': enlace } },
+    );
 
     await vi.waitFor(() => {
       fixture.detectChanges();
@@ -69,6 +73,11 @@ describe('SalasEquipos - modal del QR', () => {
     // Sigue abierto después de cargar: se puede escanear con calma.
     expect(dialogo(fixture)).not.toBeNull();
     expect(dialogo(fixture)?.textContent).toContain('Descargar PNG');
+
+    // La URL real del QR queda a la vista y se puede abrir en otra pestaña.
+    const abrir = dialogo(fixture)?.querySelector('a[target="_blank"]') as HTMLAnchorElement | null;
+    expect(abrir?.getAttribute('href')).toBe(enlace);
+    expect(dialogo(fixture)?.textContent).toContain(enlace);
   });
 
   it('si el backend falla, muestra el error en el modal en vez de cerrarlo', async () => {

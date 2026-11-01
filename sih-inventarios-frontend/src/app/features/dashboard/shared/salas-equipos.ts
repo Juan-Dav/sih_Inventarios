@@ -570,7 +570,17 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                 />
               }
             </div>
-            <div class="mt-5 flex justify-center gap-3">
+            <div class="mt-5 flex flex-wrap justify-center gap-3">
+              @if (qrEnlace(); as enlace) {
+                <a
+                  class="botón boton-secundario"
+                  [href]="enlace"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Abrir ficha
+                </a>
+              }
               <button
                 type="button"
                 class="botón boton-secundario"
@@ -583,6 +593,9 @@ type Aviso = { tipo: 'exito' | 'error'; texto: string };
                 Cerrar
               </button>
             </div>
+            @if (qrEnlace(); as enlace) {
+              <p class="mt-3 break-all text-xs text-ink-500">{{ enlace }}</p>
+            }
           </div>
         </div>
       }
@@ -636,6 +649,8 @@ export class SalasEquipos implements OnInit {
   protected readonly qrCodigo = signal('');
   protected readonly qrSala = signal('');
   protected readonly qrImagen = signal<string | null>(null);
+  /** Enlace exacto que lleva el QR, para abrirlo en otra pestaña. */
+  protected readonly qrEnlace = signal<string | null>(null);
   protected readonly qrError = signal<string | null>(null);
   protected sala = { nombre: '', capacidadMaxima: 12 };
   protected equipo = {
@@ -925,6 +940,7 @@ export class SalasEquipos implements OnInit {
     this.qrCodigo.set(equipo?.codigo || String(id));
     this.qrSala.set(equipo?.sala?.nombre || '');
     this.qrImagen.set(null);
+    this.qrEnlace.set(null);
     this.qrError.set(null);
     this.qrCargando.set(true);
     this.qrVisible.set(true);
@@ -934,9 +950,22 @@ export class SalasEquipos implements OnInit {
       .get(`${API_BASE}/equipos/${id}/qr/imagen`, {
         params: { size: 320 },
         responseType: 'blob',
+        observe: 'response',
       })
       .subscribe({
-        next: (imagen) => {
+        next: (respuesta) => {
+          // El backend devuelve en `X-Qr-Url` la misma URL que quedó dentro del
+          // QR. Así el botón "Abrir ficha" no tiene que adivinar el dominio.
+          this.qrEnlace.set(respuesta.headers.get('X-Qr-Url'));
+
+          const imagen = respuesta.body;
+          if (!imagen) {
+            this.qrCargando.set(false);
+            this.generandoQrId.set(null);
+            this.qrError.set('No se pudo preparar la imagen del QR.');
+            return;
+          }
+
           this.leerComoDataUrl(imagen)
             .then((dataUrl) => {
               this.qrImagen.set(dataUrl);
@@ -962,6 +991,7 @@ export class SalasEquipos implements OnInit {
     this.qrVisible.set(false);
     this.qrCargando.set(false);
     this.qrImagen.set(null);
+    this.qrEnlace.set(null);
     this.qrError.set(null);
     this.generandoQrId.set(null);
   }

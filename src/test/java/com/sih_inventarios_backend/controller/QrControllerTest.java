@@ -54,9 +54,10 @@ class QrControllerTest {
         assertEquals(HttpStatus.OK, respuesta.getStatusCode());
         assertEquals("image/png", respuesta.getHeaders().getContentType().toString());
         assertNotNull(equipo.getCodigoQr());
-        assertEquals(
-                "http://localhost:4200/consulta/" + equipo.getCodigoQr(),
-                leerQr(respuesta.getBody()));
+        String url = leerQr(respuesta.getBody());
+        assertEquals("http://localhost:4200/consulta/" + equipo.getCodigoQr(), url);
+        // El panel muestra este enlace para abrir la ficha en otra pestaña.
+        assertEquals(url, respuesta.getHeaders().getFirst("X-Qr-Url"));
     }
 
     @Test

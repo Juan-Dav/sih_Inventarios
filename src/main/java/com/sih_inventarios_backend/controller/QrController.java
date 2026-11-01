@@ -68,6 +68,9 @@ public class QrController {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
             headers.setCacheControl("no-cache, no-store, must-revalidate");
+            // La misma URL que va dentro del QR, para que el panel pueda
+            // ofrecer "abrir ficha" sin adivinar el dominio.
+            headers.set("X-Qr-Url", url);
             return ResponseEntity.ok().headers(headers).body(image);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

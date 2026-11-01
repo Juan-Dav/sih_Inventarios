@@ -1,0 +1,6 @@
+# Fallback de SPA para Netlify.
+#
+# Al escanear el QR se abre /consulta/<codigo> directamente. Angular Router
+# atiende esa ruta, pero el servidor debe devolver index.html con estado 200
+# (no un 302 a la portada) para que la ficha se pinte sin perder el código.
+/*    /index.html   200

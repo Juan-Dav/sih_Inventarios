@@ -124,6 +124,9 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
+        // La imagen del QR devuelve en `X-Qr-Url` el enlace exacto que codifica,
+        // y el panel lo lee desde JavaScript para mostrar "Abrir ficha".
+        config.setExposedHeaders(List.of("X-Qr-Url"));
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

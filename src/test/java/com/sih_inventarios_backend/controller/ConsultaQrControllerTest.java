@@ -64,6 +64,18 @@ class ConsultaQrControllerTest {
     }
 
     @Test
+    void tambienAceptaElIdNumericoDelEquipo() {
+        when(repositorio.findByCodigoQr("1")).thenReturn(Optional.empty());
+        when(repositorio.findById(1L)).thenReturn(Optional.of(equipoCompleto()));
+
+        ResponseEntity<?> respuesta = controller.consultar("1", CLIENTE_JSON);
+
+        assertEquals(HttpStatus.OK, respuesta.getStatusCode());
+        Map<?, ?> datos = assertInstanceOf(Map.class, respuesta.getBody());
+        assertEquals("PC-001", datos.get("codigo"));
+    }
+
+    @Test
     void unQrAntiguoInexistenteMuestraUnaPaginaDeErrorYNoJson() {
         when(repositorio.findByCodigoQr("codigo-viejo")).thenReturn(Optional.empty());
 

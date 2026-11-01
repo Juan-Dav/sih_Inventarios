@@ -37,6 +37,9 @@ import java.util.Optional;
  *
  * Se responde sin caché para que, al volver a escanear, el estado que se vea
  * sea el actual y no el que tenía la primera vez.
+ *
+ * El `{codigoQr}` puede ser el UUID guardado en `codigoQr` (lo que llevan las
+ * etiquetas) o el `id` numérico del equipo.
  */
 @RestController
 @RequestMapping("/api/consulta/qr")
@@ -53,7 +56,7 @@ public class ConsultaQrController {
             @PathVariable String codigoQr,
             @RequestHeader(value = HttpHeaders.ACCEPT, required = false) String acepta) {
 
-        Optional<Equipo> equipoOpt = equipoRepository.findByCodigoQr(codigoQr);
+        Optional<Equipo> equipoOpt = buscarEquipo(codigoQr);
 
         // Un navegador debe ver la ficha, nunca el JSON del API. Se acepta
         // también `*/*` porque algunas apps de escaneo no piden HTML de forma
@@ -82,6 +85,35 @@ public class ConsultaQrController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore())
                 .body(datosJson(equipoOpt.get()));
+    }
+
+    /**
+     * Busca el equipo por el identificador que viaja en la URL.
+     *
+     * El QR usa `codigoQr`, un UUID único guardado en la base de datos. Se
+     * acepta además el `id` numérico para que un enlace armado a mano (o una
+     * etiqueta antigua que usara el id) siga abriendo la misma ficha.
+     */
+    private Optional<Equipo> buscarEquipo(String codigoQr) {
+        if (codigoQr == null || codigoQr.isBlank()) {
+            return Optional.empty();
+        }
+
+        String codigo = codigoQr.trim();
+        Optional<Equipo> porCodigo = equipoRepository.findByCodigoQr(codigo);
+        if (porCodigo.isPresent()) {
+            return porCodigo;
+        }
+
+        if (codigo.matches("\\d{1,18}")) {
+            try {
+                return equipoRepository.findById(Long.parseLong(codigo));
+            } catch (NumberFormatException e) {
+                return Optional.empty();
+            }
+        }
+
+        return Optional.empty();
     }
 
     /** Datos que consume la ficha visual de Angular. */

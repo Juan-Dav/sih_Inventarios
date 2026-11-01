@@ -1,0 +1,29 @@
+# Despliegue del frontend Angular en Netlify.
+#
+# El QR abre directamente /consulta/<codigo> en el celular. Sin esta regla,
+# Netlify busca un archivo con esa ruta, no lo encuentra y responde su página
+# "Page not found" (404). El fallback devuelve index.html con estado 200 y deja
+# que Angular Router pinte la ficha del equipo conservando la URL original.
+#
+# El backend vive en Render (https://sih-inventarios.onrender.com/api), no aquí,
+# así que esta regla no afecta a la API.
+
+[build]
+  base = "sih-inventarios-frontend"
+  command = "npm run build"
+  publish = "dist/sih-inventarios-frontend/browser"
+
+[build.environment]
+  # Angular 21 necesita Node 20.19+ o 22.12+; Netlify fija una versión aquí
+  # para no depender de la que traiga la imagen por defecto.
+  NODE_VERSION = "22"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
