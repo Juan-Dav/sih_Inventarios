@@ -38,7 +38,7 @@ public class QrController {
     }
 
     @PostMapping("/generar-qr")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'TECNICO')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'TECNICO', 'DOCENTE')")
     public ResponseEntity<?> generar(@PathVariable Long id) {
         try {
             Equipo equipo = qrService.generarQr(id);
