@@ -11,6 +11,9 @@ import com.sih_inventarios_backend.service.QrService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -69,6 +72,31 @@ class QrControllerTest {
         assertEquals(
                 "https://inventario.ejemplo.com/consulta/codigo-fijo",
                 leerQr(respuesta.getBody()));
+    }
+
+    @Test
+    void sinOrigenNiFrontendUrlElQrApuntaALaTablaDelBackend() throws Exception {
+        QrController sinConfigurar = new QrController(qrService, repositorio, "");
+        Equipo equipo = equipo(9L);
+        equipo.setCodigoQr("codigo-fijo");
+        when(repositorio.findById(9L)).thenReturn(Optional.of(equipo));
+
+        MockHttpServletRequest peticion = new MockHttpServletRequest();
+        peticion.setScheme("https");
+        peticion.setServerName("sih-inventarios.onrender.com");
+        peticion.setServerPort(443);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(peticion));
+
+        try {
+            ResponseEntity<byte[]> respuesta = sinConfigurar.imagen(9L, 320, null, null);
+
+            assertEquals(HttpStatus.OK, respuesta.getStatusCode());
+            assertEquals(
+                    "https://sih-inventarios.onrender.com/api/consulta/qr/codigo-fijo",
+                    leerQr(respuesta.getBody()));
+        } finally {
+            RequestContextHolder.resetRequestAttributes();
+        }
     }
 
     @Test

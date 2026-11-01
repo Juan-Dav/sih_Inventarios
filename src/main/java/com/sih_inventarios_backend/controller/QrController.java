@@ -93,8 +93,12 @@ public class QrController {
             base = normalizarBase(frontendUrl);
         }
 
+        // Último recurso: no hay origen del navegador ni FRONTEND_URL. Se usa la
+        // ruta pública del propio backend, que también responde una tabla HTML
+        // legible al escanear. Apuntar a `/consulta/...` aquí llevaría a un 404.
         if (base == null) {
             base = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+            return base + "/api/consulta/qr/" + codigoQr;
         }
 
         return base + "/consulta/" + codigoQr;

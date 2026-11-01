@@ -59,6 +59,9 @@ public class SecurityConfig {
                         // consulta desde el celular, que tampoco tiene sesión.
                         // Por eso ambas rutas quedan abiertas.
                         .requestMatchers(HttpMethod.GET, "/api/equipos/*/qr/imagen", "/api/consulta/qr/**").permitAll()
+                        // Alias de las etiquetas antiguas que quedaron apuntando
+                        // a /consulta/{codigo} en el dominio del backend.
+                        .requestMatchers(HttpMethod.GET, "/consulta/**").permitAll()
                         // El plan se puede leer desde cualquier panel (los tres
                         // roles necesitan ver los límites).
                         .requestMatchers(HttpMethod.GET, "/api/plan").authenticated()
